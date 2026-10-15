@@ -381,7 +381,9 @@ header .inner{max-width:1450px;min-height:68px;padding:12px 24px}.brand{text-dec
 .dashboard-redesign .project-settings-menu button:hover,
 .dashboard-redesign .project-settings-menu button:focus-visible{background:#f3f4f6;outline:none;}
 
-/* Step 18D — Thin four-color lines */
-.dashboard-redesign .project-links-panel .project-tagline-bars span {
-    height: 4px;
+/* Step 18D — definitive thin four-color branding bars (all screen sizes). */
+.dashboard-redesign .project-links-panel .project-tagline-bars > span {
+  height: 3px;
+  min-height: 3px;
+  max-height: 3px;
 }
