@@ -7,7 +7,31 @@
 <div class="warning" id="dataWarning" role="status"></div>
 <section class="card project-simple" id="project">
   <div class="project-ident"><div class="eyebrow"><span class="dot"></span>CLIENT DASHBOARD</div><div class="project-title-line"><h1 id="projectName">Loading project...</h1><span class="project-type" id="projectType">—</span><span class="project-state" id="projectStatus"></span></div><p class="project-subline"><span id="projectClient">—</span><span class="sep">|</span><span id="projectAddress">—</span></p></div>
-  <div class="project-mini-brand">ID<span>+</span>EA <small>PROJECT CONTROL</small></div>
+  <div class="project-links-panel">
+    <div class="project-tagline" aria-label="Design. Build. Track. Deliver.">
+      <div class="project-tagline-bars" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+      <div class="project-tagline-text">Design. Build. Track. Deliver.</div>
+    </div>
+    <nav class="project-drive-actions" aria-label="Project files">
+      <button class="drive-link" type="button" id="openDriveDrawings" aria-label="View Drawings">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 8 4-4 12 12-4 4L4 8Z"/><path d="m8 8 2-2m0 5 2-2m1 5 2-2m1 5 2-2"/></svg>
+        <span>Drawings</span>
+      </button>
+      <button class="drive-link" type="button" id="openDriveBills" aria-label="View Bills">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z"/><path d="M9 8h6m-6 4h6"/></svg>
+        <span>Bills</span>
+      </button>
+      <div class="project-settings-control" id="projectSettingsControl">
+        <button class="drive-link" type="button" id="projectSettingsToggle" aria-label="Settings" aria-haspopup="true" aria-expanded="false" aria-controls="projectSettingsMenu">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5a2 2 0 0 1 1.9 1.4l.3.9a7.7 7.7 0 0 1 1.4.8l.9-.2a2 2 0 0 1 2.1 1l.9 1.6a2 2 0 0 1-.3 2.3l-.6.7v1.6l.6.7a2 2 0 0 1 .3 2.3l-.9 1.6a2 2 0 0 1-2.1 1l-.9-.2a7.7 7.7 0 0 1-1.4.8l-.3.9a2 2 0 0 1-1.9 1.4h-1.8a2 2 0 0 1-1.9-1.4l-.3-.9a7.7 7.7 0 0 1-1.4-.8l-.9.2a2 2 0 0 1-2.1-1l-.9-1.6a2 2 0 0 1 .3-2.3l.6-.7v-1.6l-.6-.7a2 2 0 0 1-.3-2.3l.9-1.6a2 2 0 0 1 2.1-1l.9.2a7.7 7.7 0 0 1 1.4-.8l.3-.9a2 2 0 0 1 1.9-1.4Z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>Settings</span>
+        </button>
+        <div class="project-settings-menu" id="projectSettingsMenu" role="menu" hidden>
+          <button type="button" id="openChangeAccessCode" role="menuitem">Change Access Code</button>
+        </div>
+      </div>
+    </nav>
+  </div>
 </section>
 <section class="card section" id="monthly"><div class="sectionhead"><h2>SUMMARY</h2><select id="monthSelect" aria-label="Select Total Project or reporting month"><option value="all">Total Project</option></select></div>
  <div class="summary-rows"><div><span>Total Expenditure</span><strong id="monthlyTotal">—</strong></div><div><span>Material Bill Amount</span><strong id="materialTotal">—</strong></div><div><span>Workforce Bill</span><strong id="workforceTotal">—</strong></div><div><span>Service Charge (incl. GST)</span><strong id="serviceTotal">—</strong></div></div>
@@ -20,7 +44,7 @@
 </div>
 <div class="bottomgrid"><section class="card listcard" id="remarks"><div class="sectionhead"><h2>REMARKS</h2><a href="#" data-view="remarks">View All</a></div><div class="scroll"><table><thead><tr><th>Date</th><th>Remark</th></tr></thead><tbody id="remarksBody"></tbody></table></div></section>
 <section class="card section" id="cash"><div class="sectionhead"><h2>CASH FLOW</h2></div><div class="cash-simple"><div><span>Cash IN</span><strong class="good" id="cashIn">—</strong></div><div><span>Cash OUT</span><strong class="bad" id="cashOut">—</strong></div></div><p class="subtle-note">Cash movements are separate from accrued expenditure.</p></section></div>
-<div class="client-security-actions"><button type="button" id="openChangeAccessCode">Change Access Code</button></div>
+
 <div class="portal-footer"><span>ID+EA <b>·</b> TECHNOLOGY-ENABLED CONSTRUCTION</span><span>Design. Build. Track. Deliver.</span></div>
 <p class="disclaimer" id="disclaimer">Project records are loaded securely from your Google Sheets dashboard.</p></main>
 <nav class="mobile-nav"><a href="#project">Project</a><a href="#monthly">Summary</a><a href="#materials">Materials</a><a href="#parties">Parties</a><a href="#cash">Cash Flow</a></nav>
@@ -46,4 +70,4 @@
 .client-access-actions{display:flex;justify-content:end;gap:10px;margin-top:8px}.client-access-actions button{padding:10px 14px;border-radius:8px;border:1px solid #ddd;cursor:pointer}.client-access-actions button[type=submit]{background:#111;color:white}.client-access-actions button:disabled{opacity:.5;cursor:wait}
 #changeAccessStatus{min-height:20px;color:#9f2525}
 </style>
-<script src="script.js"></script><script src="site-config.js"></script><script src="client-dashboard.js"></script></body></html>
+<script src="script.js"></script><script src="site-config.js"></script><script src="client-dashboard.js"></script><script src="client-drive.js"></script></body></html>
