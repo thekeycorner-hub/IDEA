@@ -508,3 +508,26 @@ header .inner{max-width:1450px;min-height:68px;padding:12px 24px}.brand{text-dec
 .modal .remark-lines { text-align: left; line-height: 1.55; white-space: normal; overflow-wrap: anywhere; }
 .dashboard-redesign .remark-lines > div + div,
 .modal .remark-lines > div + div { margin-top: 2px; }
+
+
+/* Step 19I — Match the three cards above: Remarks spans two columns, Cash Flow one. */
+@media (min-width: 900px) {
+  .dashboard-redesign .bottomgrid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 12px;
+    align-items: stretch;
+  }
+  .dashboard-redesign .bottomgrid > * { min-width: 0; }
+}
+/* Preserve the mobile stacked layout. */
+@media (max-width: 899px) {
+  .dashboard-redesign .bottomgrid { grid-template-columns: minmax(0, 1fr); }
+}
+/* Align remark entries and the Remark column heading to the right. */
+.dashboard-redesign #remarks th:last-child,
+.dashboard-redesign #remarks td.remarks-text-cell,
+.dashboard-redesign #remarks .remarks-text-cell,
+#modal td.remarks-text-cell { text-align: right !important; }
+.dashboard-redesign #remarks .remark-lines,
+#modal .remark-lines { text-align: right !important; line-height: 1.55; }
