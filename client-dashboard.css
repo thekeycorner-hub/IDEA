@@ -399,3 +399,23 @@ header .inner{max-width:1450px;min-height:68px;padding:12px 24px}.brand{text-dec
 .party-modal-table.party-modal-six td:nth-child(3),.party-modal-table.party-modal-six td:nth-child(4),.party-modal-table.party-modal-six td:nth-child(5){white-space:nowrap;font-variant-numeric:tabular-nums}
 .party-modal-table.party-modal-six .balance-sort-button{justify-content:flex-end;width:100%}
 .party-modal-table.party-modal-six .view-party-ledger{white-space:nowrap}
+
+/* Step 19C — compact Party List popup, all six columns in the available viewport. */
+#modal:has(.party-modal-six) .modal-panel{width:min(980px,calc(100vw - 24px));max-width:100%;padding:18px 18px;overflow-x:hidden}
+#modal:has(.party-modal-six) #modalBody{min-width:0}
+#modal:has(.party-modal-six) .ledger-scroller{width:100%;max-width:100%;overflow-x:visible}
+#modal .party-modal-table.party-modal-six{width:100%;min-width:0;max-width:100%;table-layout:fixed}
+#modal .party-modal-table.party-modal-six th,#modal .party-modal-table.party-modal-six td{padding:10px 6px;font-size:12px;vertical-align:middle}
+#modal .party-modal-table.party-modal-six th{line-height:1.2}
+#modal .party-modal-table.party-modal-six th:nth-child(3),#modal .party-modal-table.party-modal-six th:nth-child(4),#modal .party-modal-table.party-modal-six th:nth-child(5){white-space:normal}
+#modal .party-modal-table.party-modal-six td:nth-child(2){overflow-wrap:anywhere}
+#modal .party-modal-table.party-modal-six .view-party-ledger{padding:6px 7px;font-size:11px;border-radius:7px;max-width:100%;white-space:nowrap}
+#modal .party-modal-table.party-modal-six .balance-sort-button{font-size:inherit;gap:2px}
+@media(max-width:650px){
+ #modal:has(.party-modal-six){padding:7px}
+ #modal:has(.party-modal-six) .modal-panel{width:100%;padding:13px 8px;border-radius:12px}
+ #modal .party-modal-table.party-modal-six th,#modal .party-modal-table.party-modal-six td{padding:7px 2px;font-size:9px}
+ #modal .party-modal-table.party-modal-six td:nth-child(3),#modal .party-modal-table.party-modal-six td:nth-child(4),#modal .party-modal-table.party-modal-six td:nth-child(5){white-space:normal;overflow-wrap:anywhere}
+ #modal .party-modal-table.party-modal-six .view-party-ledger{font-size:9px;padding:5px 3px;white-space:normal;line-height:1.15}
+ #modal .party-modal-table.party-modal-six .balance-sort-arrow{font-size:10px}
+}
