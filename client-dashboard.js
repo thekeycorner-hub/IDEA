@@ -31,12 +31,13 @@ function partyRows(parties){return parties.map(p=>{
  const balance=num(p.balance),balanceClass=balance<-.005?'advance':Math.abs(balance)<.005?'settled':'';
  return '<tr class="party-main-row"><td>'+safe(p.name)+'</td><td>'+safe(p.type)+'</td><td class="right party-balance '+balanceClass+'">'+safe(amount(balance))+'</td></tr>';
 }).join('');}
-function remarkBullets(value){
+// Show Android Remarks as plain multiline text, with no auto-generated bullets.
+function remarkText(value){
  const lines=String(value??'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
  if(!lines.length)return '—';
- return '<ul class="remark-bullets">'+lines.map(line=>'<li>'+safe(line.replace(/^(?:[•●▪◦*]|-)(?:\s+|$)/,''))+'</li>').join('')+'</ul>';
+ return '<div class="remark-lines">'+lines.map(line=>'<div>'+safe(line)+'</div>').join('')+'</div>';
 }
-function remarkRow(r){return '<tr><td>'+safe(r.date)+'</td><td>'+remarkBullets(r.text)+'</td></tr>';}
+function remarkRow(r){return '<tr class="remarks-row"><td>'+safe(r.date)+'</td><td class="remarks-text-cell">'+remarkText(r.text)+'</td></tr>';}
 function ledgerType(source,delta){const s=String(source||'').toUpperCase();if(s==='MATERIAL')return 'Material';if(s==='WORKFORCE')return 'Workforce';if(s==='CASH_OUT')return 'Payment';if(s==='CLIENT_RECEIPT')return 'Receipt';if(s==='MANUAL_BILL')return 'Bill';if(s==='MANUAL_SETTLEMENT')return 'Settlement';return s|| (delta>=0?'Bill':'Payment');}
 function ledgerHtml(result){if(!result.success)return '<p class="ledger-error">'+safe(result.message||'Unable to load party ledger')+'</p>';
  const entries=result.entries||[];if(!entries.length)return '<p class="ledger-empty">No transactions for this party.</p>';
