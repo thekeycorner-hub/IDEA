@@ -387,3 +387,15 @@ header .inner{max-width:1450px;min-height:68px;padding:12px 24px}.brand{text-dec
   min-height: 3px;
   max-height: 3px;
 }
+
+/* Step 19B — Six well-spaced columns in Party List > View All. */
+.party-modal-table.party-modal-six{width:100%;min-width:900px;table-layout:fixed;border-collapse:collapse}
+.party-modal-table.party-modal-six th,.party-modal-table.party-modal-six td{box-sizing:border-box;padding:13px 12px;vertical-align:middle}
+.party-modal-table.party-modal-six th:nth-child(3),.party-modal-table.party-modal-six td:nth-child(3),
+.party-modal-table.party-modal-six th:nth-child(4),.party-modal-table.party-modal-six td:nth-child(4),
+.party-modal-table.party-modal-six th:nth-child(5),.party-modal-table.party-modal-six td:nth-child(5){text-align:right}
+.party-modal-table.party-modal-six th:nth-child(6),.party-modal-table.party-modal-six td:nth-child(6){text-align:center}
+.party-modal-table.party-modal-six td:first-child{overflow-wrap:anywhere}
+.party-modal-table.party-modal-six td:nth-child(3),.party-modal-table.party-modal-six td:nth-child(4),.party-modal-table.party-modal-six td:nth-child(5){white-space:nowrap;font-variant-numeric:tabular-nums}
+.party-modal-table.party-modal-six .balance-sort-button{justify-content:flex-end;width:100%}
+.party-modal-table.party-modal-six .view-party-ledger{white-space:nowrap}
