@@ -499,3 +499,12 @@ header .inner{max-width:1450px;min-height:68px;padding:12px 24px}.brand{text-dec
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Step 19H — Android multiline remarks: no bullets, left aligned. */
+.dashboard-redesign #remarks .remarks-text-cell,
+.dashboard-redesign #remarks td.remarks-text-cell,
+.modal td.remarks-text-cell { text-align: left !important; }
+.dashboard-redesign .remark-lines,
+.modal .remark-lines { text-align: left; line-height: 1.55; white-space: normal; overflow-wrap: anywhere; }
+.dashboard-redesign .remark-lines > div + div,
+.modal .remark-lines > div + div { margin-top: 2px; }
