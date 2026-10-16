@@ -475,3 +475,27 @@ header .inner{max-width:1450px;min-height:68px;padding:12px 24px}.brand{text-dec
 #modal .party-modal-table.party-modal-six td:nth-child(5) { width: 15%; }
 #modal .party-modal-table.party-modal-six th:nth-child(6),
 #modal .party-modal-table.party-modal-six td:nth-child(6) { width: 15%; }
+
+/* Step 19F — Party total and multiline remark display */
+.dashboard-redesign .party-total-balance{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 5px 2px;margin-top:8px;border-top:1px solid #e6e9ed;font-size:12px;font-weight:700;color:#282d33}
+.dashboard-redesign .party-total-balance strong{font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.dashboard-redesign .party-total-balance strong.advance{color:#b42335}
+.dashboard-redesign .party-total-balance strong.settled{color:#23794c}
+.dashboard-redesign .remark-bullets, .modal .remark-bullets{margin:0;padding:0 0 0 18px;list-style:disc outside;line-height:1.5;white-space:normal;overflow-wrap:anywhere}
+.dashboard-redesign .remark-bullets li+li, .modal .remark-bullets li+li{margin-top:3px}
+
+/* Step 19G: Remarks (70%) and Cash Flow (30%) on laptop/desktop. */
+@media (min-width: 900px) {
+  .dashboard-redesign .bottomgrid {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 3fr);
+    gap: 12px;
+    align-items: stretch;
+  }
+  .dashboard-redesign .bottomgrid > * { min-width: 0; }
+}
+@media (max-width: 899px) {
+  .dashboard-redesign .bottomgrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
