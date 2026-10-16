@@ -51,13 +51,14 @@ function showAllParties(){
  const parties=(data.parties||[]).map((party,index)=>({party,index})).sort((a,b)=>{
   const difference=num(a.party.balance)-num(b.party.balance);
   return (partyBalanceSort==='asc'?difference:-difference)||a.index-b.index;
- }); // Sort numeric balance, retaining original party indexes for the ledger action.
+ }); // Keep source indexes for View Ledger.
  fill('modalTitle','Party List');
- document.getElementById('modalBody').innerHTML='<div class="ledger-scroller"><table class="party-modal-table"><thead><tr><th>Party</th><th>Type</th><th class="right">Bill Amount</th><th><button type="button" class="balance-sort-button" id="sortPartyBalance" aria-label="Sort by balance '+(partyBalanceSort==='asc'?'low to high':'high to low')+'" title="Sort balance '+(partyBalanceSort==='asc'?'low to high':'high to low')+'">Balance <span aria-hidden="true" class="balance-sort-arrow">'+(partyBalanceSort==='asc'?'↑':'↓')+'</span></button></th><th>Ledger</th></tr></thead><tbody>'+(
-  parties.length?parties.map(({party:p,index:i})=>{
-   const balance=num(p.balance),cls=balance<-.005?'advance':Math.abs(balance)<.005?'settled':'';
-   return '<tr><td>'+safe(p.name)+'</td><td>'+safe(p.type)+'</td><td class="right">'+safe(p.billAmount==null?'—':amount(p.billAmount))+'</td><td class="right party-balance '+cls+'">'+safe(amount(balance))+'</td><td><button type="button" class="view-party-ledger" data-modal-party="'+i+'">View Ledger</button></td></tr>';
-  }).join(''):'<tr><td colspan="5" class="empty">No project parties found</td></tr>')+'</tbody></table></div>';
+ const head='<div class="ledger-scroller"><table class="party-modal-table party-modal-six"><colgroup><col style="width:24%"><col style="width:14%"><col style="width:16%"><col style="width:16%"><col style="width:16%"><col style="width:14%"></colgroup><thead><tr><th>Party</th><th>Type</th><th class="right">Bill Amount</th><th class="right">Amount Paid</th><th class="right"><button type="button" class="balance-sort-button" id="sortPartyBalance" aria-label="Sort by balance '+(partyBalanceSort==='asc'?'low to high':'high to low')+'" title="Sort balance '+(partyBalanceSort==='asc'?'low to high':'high to low')+'">Balance <span aria-hidden="true" class="balance-sort-arrow">'+(partyBalanceSort==='asc'?'↑':'↓')+'</span></button></th><th>Ledger</th></tr></thead><tbody>';
+ const rows=parties.length?parties.map(({party:p,index:i})=>{
+  const balance=num(p.balance),cls=balance<-.005?'advance':Math.abs(balance)<.005?'settled':'';
+  return '<tr><td>'+safe(p.name)+'</td><td>'+safe(p.type)+'</td><td class="right">'+safe(p.billAmount==null?'—':amount(p.billAmount))+'</td><td class="right">'+safe(p.amountPaid==null?'—':amount(p.amountPaid))+'</td><td class="right party-balance '+cls+'">'+safe(amount(balance))+'</td><td><button type="button" class="view-party-ledger" data-modal-party="'+i+'">View Ledger</button></td></tr>';
+ }).join(''):'<tr><td colspan="6" class="empty">No project parties found</td></tr>';
+ document.getElementById('modalBody').innerHTML=head+rows+'</tbody></table></div>';
  document.getElementById('modal').classList.add('show');
 }
 async function showPartyLedger(index){
