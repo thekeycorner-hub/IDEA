@@ -41,13 +41,13 @@ function remarkRow(r){return '<tr class="remarks-row"><td>'+safe(r.date)+'</td><
 function ledgerType(source,delta){const s=String(source||'').toUpperCase();if(s==='MATERIAL')return 'Material';if(s==='WORKFORCE')return 'Workforce';if(s==='CASH_OUT')return 'Payment';if(s==='CLIENT_RECEIPT')return 'Receipt';if(s==='MANUAL_BILL')return 'Bill';if(s==='MANUAL_SETTLEMENT')return 'Settlement';return s|| (delta>=0?'Bill':'Payment');}
 function ledgerHtml(result){if(!result.success)return '<p class="ledger-error">'+safe(result.message||'Unable to load party ledger')+'</p>';
  const entries=result.entries||[];if(!entries.length)return '<p class="ledger-empty">No transactions for this party.</p>';
- return '<div class="ledger-scroller"><table class="ledger-table"><thead><tr><th>Date</th><th>Debit / Credit</th><th>Material / Payment</th><th>Balance</th></tr></thead><tbody>'+entries.map(e=>{
+ return '<div class="ledger-scroller"><table class="ledger-table"><thead><tr><th>Date</th><th>Debit / Credit</th><th>Material / Payment</th><th>Description</th><th>Balance</th></tr></thead><tbody>'+entries.map(e=>{
  const delta=num(e.delta),positive=delta>=0;
- return '<tr><td>'+safe(e.date||e.isoDate)+'</td><td class="'+(positive?'ledger-credit':'ledger-debit')+'">'+(positive?'Cr ':'Dr ')+safe(amount(Math.abs(delta)))+'</td><td>'+safe(ledgerType(e.source,delta))+(e.description?'<small>'+safe(e.description)+'</small>':'')+'</td><td class="right">'+safe(amount(e.runningBalance))+'</td></tr>';
+ return '<tr><td>'+safe(e.date||e.isoDate)+'</td><td class="'+(positive?'ledger-credit':'ledger-debit')+'">'+(positive?'Cr ':'Dr ')+safe(amount(Math.abs(delta)))+'</td><td>'+safe(e.item||ledgerType(e.source,delta))+'</td><td>'+safe(e.description||'—')+'</td><td class="right">'+safe(amount(e.runningBalance))+'</td></tr>';
  }).join('')+'</tbody></table></div><p class="ledger-foot">Closing balance: <strong>'+safe(amount(result.balance))+'</strong> · Credit increases outstanding; debit reduces it. Negative means advance paid.</p>';
 }
 async function fetchPartyLedger(party){
- if(CONFIG.USE_DEMO) return {success:true,entries:[{date:'02/10/2026',source:'MATERIAL',description:'Cement',delta:num(party.balance)+10000,runningBalance:num(party.balance)+10000},{date:'04/10/2026',source:'CASH_OUT',description:'Payment',delta:-10000,runningBalance:num(party.balance)}],balance:num(party.balance)};
+ if(CONFIG.USE_DEMO) return {success:true,entries:[{date:'02/10/2026',source:'MATERIAL',item:'Cement',description:'Material purchase',delta:num(party.balance)+10000,runningBalance:num(party.balance)+10000},{date:'04/10/2026',source:'CASH_OUT',item:'Payment',description:'Payment',delta:-10000,runningBalance:num(party.balance)}],balance:num(party.balance)};
  const id=String(party.partyId||'').trim();if(!id)return {success:false,message:'Party ID missing. Re-deploy the updated project dashboard backend.'};
  if(!portalToken||sessionStorage.getItem('ideaClientProjectId')!==projectId)return {success:false,message:'Client session expired. Please sign in again.'};
  const url=new URL(CONFIG.API_URL);url.searchParams.set('action','clientPartyHistory');url.searchParams.set('projectId',projectId);url.searchParams.set('partyId',id);url.searchParams.set('accessToken',portalToken);
