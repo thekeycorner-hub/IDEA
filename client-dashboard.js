@@ -98,6 +98,29 @@ document.getElementById('modalBody').addEventListener('click',e=>{const btn=e.ta
 document.getElementById('closeModal').onclick=()=>document.getElementById('modal').classList.remove('show');document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')e.currentTarget.classList.remove('show');});document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('modal').classList.remove('show');});document.getElementById('monthSelect').onchange=e=>selectMonth(e.target.value);
 (async()=>{try{data=await fetchData();projectId=data.project.id||projectId;showProject();buildMonths();if(!CONFIG.USE_DEMO)fill('disclaimer','Figures loaded from your configured dashboard service.');}catch(e){setWarning('Could not load live project data: '+e.message);fill('disclaimer','No live data loaded.');fill('projectName','Project unavailable');}})();
 
+// Project session actions live in the dashboard Settings dropdown.
+(function initProjectSettingsMenu(){
+  const control=document.getElementById('projectSettingsControl');
+  const toggle=document.getElementById('projectSettingsToggle');
+  const menu=document.getElementById('projectSettingsMenu');
+  const logout=document.getElementById('clientLogout');
+  if(!control||!toggle||!menu)return;
+  const close=()=>{menu.hidden=true;toggle.setAttribute('aria-expanded','false');};
+  toggle.addEventListener('click',()=>{
+    menu.hidden=!menu.hidden;
+    toggle.setAttribute('aria-expanded',String(!menu.hidden));
+  });
+  document.addEventListener('click',event=>{if(!control.contains(event.target))close();});
+  document.addEventListener('keydown',event=>{if(event.key==='Escape')close();});
+  logout?.addEventListener('click',()=>{
+    sessionStorage.removeItem('ideaClientAccessToken');
+    sessionStorage.removeItem('ideaClientProjectId');
+    sessionStorage.removeItem('ideaPreviewAccess');
+    close();
+    location.replace('client-access.html');
+  });
+})();
+
 // Client self-service: change the project access code without exposing it in the URL.
 (function initAccessCodeChange(){
   const open=document.getElementById('openChangeAccessCode');
@@ -109,7 +132,13 @@ document.getElementById('closeModal').onclick=()=>document.getElementById('modal
   if(!open||!dialog||!form||!close||!status||!save)return;
   if(CONFIG.USE_DEMO){open.hidden=true;return;}
   const hide=()=>{if(!save.disabled){dialog.hidden=true;form.reset();status.textContent='';}};
-  open.addEventListener('click',()=>{dialog.hidden=false;status.textContent='';document.getElementById('currentClientCode').focus();});
+  open.addEventListener('click',()=>{
+    const menu=document.getElementById('projectSettingsMenu');
+    const toggle=document.getElementById('projectSettingsToggle');
+    if(menu)menu.hidden=true;
+    toggle?.setAttribute('aria-expanded','false');
+    dialog.hidden=false;status.textContent='';document.getElementById('currentClientCode').focus();
+  });
   close.addEventListener('click',hide);
   dialog.addEventListener('click',e=>{if(e.target===dialog)hide();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!dialog.hidden)hide();});

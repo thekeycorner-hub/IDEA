@@ -1,54 +1,94 @@
-/* Step 18B — browser-only secure private files. Existing dashboard script unchanged. */
-(()=>{'use strict';
-const htmlEsc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const modalEl=document.getElementById('modal'),body=document.getElementById('modalBody');
-const title=document.getElementById('modalTitle');
-const configuredApi=window.IDEA_SITE_CONFIG?.API_URL||'';
-const pid=new URLSearchParams(location.search).get('projectId')||'P001';
-function authorized(){return sessionStorage.getItem('ideaClientAccessToken')&&sessionStorage.getItem('ideaClientProjectId')===pid;}
-async function api(action,params={}){
- if(!configuredApi)throw Error('Connect your published Google Apps Script endpoint first.');
- if(!authorized())throw Error('Please sign in to this project again.');
- const u=new URL(configuredApi);u.searchParams.set('action',action);u.searchParams.set('projectId',pid);u.searchParams.set('accessToken',sessionStorage.getItem('ideaClientAccessToken'));
- Object.entries(params).forEach(([k,v])=>u.searchParams.set(k,v));
- const r=await fetch(u.toString());if(!r.ok)throw Error('Request failed ('+r.status+')');
- const d=await r.json();if(d.success!==true)throw Error(d.message||'Unable to load files');return d;
-}
-let activeKind='',entries=[];
-function panel(kind){activeKind=kind;title.textContent=kind;body.innerHTML='<p class="drive-file-hint">Loading '+htmlEsc(kind.toLowerCase())+' from this project’s private Google Drive folder…</p>';modalEl.classList.add('show');}
-async function list(kind){panel(kind);
- try{const resp=await api('clientDriveList',{kind});if(activeKind!==kind||!modalEl.classList.contains('show'))return;
- entries=resp.files||[];
- body.innerHTML='<p class="drive-file-hint">Files are read-only. Select a PDF or image to view or download.</p>'+
- (entries.length?'<div class="drive-file-list">'+entries.map((f,i)=>'<button type="button" class="drive-file-item" data-drive-file="'+i+'" '+(f.tooLarge?'disabled title="File exceeds 7 MB preview limit"':'')+'><span><span class="drive-file-name">'+htmlEsc(f.name)+'</span><span class="drive-file-meta">'+htmlEsc(new Date(f.updated).toLocaleDateString('en-IN'))+' · '+htmlEsc(f.mimeType)+(f.tooLarge?' · Over 7 MB':'')+'</span></span><span aria-hidden="true">'+(f.tooLarge?'—':'↗')+'</span></button>').join('')+'</div>':'<p class="drive-file-hint">No PDF or image files in this folder yet.</p>');
- }catch(e){if(activeKind===kind)body.innerHTML='<p class="drive-file-error">'+htmlEsc(e.message)+'</p>';}
-}
-// Save user-selected file locally as a Blob, avoiding public Drive sharing URLs.
-body.addEventListener('click',async e=>{
- const btn=e.target.closest('[data-drive-file]');if(!btn)return;
- const item=entries[Number(btn.dataset.driveFile)];if(!item)return;
- btn.disabled=true;const old=btn.innerHTML;btn.querySelector('.drive-file-name').textContent='Loading: '+item.name;
- try{
-  const file=await api('clientDriveFile',{kind:activeKind,fileId:item.id});
-  const raw=atob(file.base64),bytes=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
-  const url=URL.createObjectURL(new Blob([bytes],{type:file.mimeType}));
-  const a=document.createElement('a');a.href=url;a.download=file.name;a.style.display='none';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
- }catch(err){alert('File unavailable: '+err.message);}finally{btn.disabled=false;btn.innerHTML=old;}
-});
-document.getElementById('openDriveDrawings')?.addEventListener('click',()=>list('Drawings'));
-document.getElementById('openDriveBills')?.addEventListener('click',()=>list('Bills'));
-})();
+// Secure project-file browser for the existing Drawings and Bills dashboard buttons.
+(() => {
+  const apiUrl = window.IDEA_SITE_CONFIG?.API_URL || '';
+  const params = new URLSearchParams(location.search);
+  const projectId = params.get('projectId') || '';
+  const token = sessionStorage.getItem('ideaClientAccessToken') || '';
+  const sessionProjectId = sessionStorage.getItem('ideaClientProjectId') || '';
+  const modal = document.getElementById('modal');
+  const title = document.getElementById('modalTitle');
+  const body = document.getElementById('modalBody');
 
-/* Step 18C: Settings dropdown; existing Change Access Code listener remains in client-dashboard.js. */
-(()=>{
- const toggle=document.getElementById('projectSettingsToggle');
- const menu=document.getElementById('projectSettingsMenu');
- const root=document.getElementById('projectSettingsControl');
- const change=document.getElementById('openChangeAccessCode');
- if(!toggle||!menu||!root||!change)return;
- const close=()=>{menu.hidden=true;toggle.setAttribute('aria-expanded','false');};
- toggle.addEventListener('click',()=>{const show=menu.hidden;menu.hidden=!show;toggle.setAttribute('aria-expanded',String(show));});
- change.addEventListener('click',close);
- document.addEventListener('click',e=>{if(!root.contains(e.target))close();});
- document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!menu.hidden){close();toggle.focus();}});
+  const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[ch]);
+
+  function showModal(heading, content) {
+    title.textContent = heading;
+    body.innerHTML = content;
+    modal.classList.add('show');
+  }
+
+  function requestUrl(action, kind, fileId) {
+    const url = new URL(apiUrl);
+    url.searchParams.set('action', action);
+    url.searchParams.set('projectId', projectId);
+    url.searchParams.set('accessToken', token);
+    if (kind) url.searchParams.set('kind', kind);
+    if (fileId) url.searchParams.set('fileId', fileId);
+    return url.toString();
+  }
+
+  async function loadFolder(kind) {
+    if (!apiUrl || !token || projectId !== sessionProjectId) {
+      showModal(kind, '<p class="empty">Your client session has expired. Sign in again to view project files.</p>');
+      return;
+    }
+    showModal(kind, '<p class="empty">Loading project files…</p>');
+    try {
+      const response = await fetch(requestUrl('clientDriveList', kind));
+      if (!response.ok) throw new Error('Drive request failed (' + response.status + ').');
+      const result = await response.json();
+      if (!result.success) throw new Error(result.message || 'Unable to load project files.');
+      const files = result.files || [];
+      if (!files.length) {
+        body.innerHTML = '<p class="empty">No supported files were found in this folder.</p>';
+        return;
+      }
+      body.innerHTML = '<div class="client-drive-list">' + files.map(file =>
+        '<div class="client-drive-row"><div><strong>' + escapeHtml(file.name) + '</strong>' +
+        '<small>' + escapeHtml(file.mimeType) + ' · ' + escapeHtml(file.updated || '') +
+        (file.tooLarge ? ' · Too large to preview' : '') + '</small></div>' +
+        (file.tooLarge ? '' : '<button type="button" class="client-drive-preview" data-drive-file="' +
+          escapeHtml(file.id) + '">Preview</button>') + '</div>'
+      ).join('') + '</div>';
+    } catch (error) {
+      body.innerHTML = '<p class="empty">' + escapeHtml(error.message || 'Unable to load project files.') + '</p>';
+    }
+  }
+
+  async function previewFile(fileId, kind) {
+    showModal(kind, '<p class="empty">Loading preview…</p>');
+    try {
+      const response = await fetch(requestUrl('clientDriveFile', kind, fileId));
+      if (!response.ok) throw new Error('File request failed (' + response.status + ').');
+      const result = await response.json();
+      if (!result.success) throw new Error(result.message || 'Unable to open this file.');
+      const dataUrl = 'data:' + result.mimeType + ';base64,' + result.base64;
+      const preview = result.mimeType === 'application/pdf'
+        ? '<iframe class="client-drive-pdf" title="' + escapeHtml(result.name) + '" src="' + dataUrl + '"></iframe>'
+        : '<img class="client-drive-image" alt="' + escapeHtml(result.name) + '" src="' + dataUrl + '">';
+      showModal(result.name, '<button type="button" class="client-drive-back" data-drive-back="' +
+        escapeHtml(kind) + '">← Back to ' + escapeHtml(kind) + '</button>' + preview);
+    } catch (error) {
+      showModal(kind, '<p class="empty">' + escapeHtml(error.message || 'Unable to open this file.') + '</p>');
+    }
+  }
+
+  document.getElementById('openDriveDrawings')?.addEventListener('click', () => loadFolder('Drawings'));
+  document.getElementById('openDriveBills')?.addEventListener('click', () => loadFolder('Bills'));
+  body?.addEventListener('click', event => {
+    const previewButton = event.target.closest('[data-drive-file]');
+    if (previewButton) {
+      const kind = title.textContent;
+      previewFile(previewButton.dataset.driveFile, kind);
+      return;
+    }
+    const backButton = event.target.closest('[data-drive-back]');
+    if (backButton) loadFolder(backButton.dataset.driveBack);
+  });
+
+  const style = document.createElement('style');
+  style.textContent = '.client-drive-list{display:grid;gap:10px}.client-drive-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid #e5e5e5;border-radius:10px;background:#fff}.client-drive-row strong,.client-drive-row small{display:block;overflow-wrap:anywhere}.client-drive-row small{margin-top:4px;color:#777;font-size:12px}.client-drive-preview,.client-drive-back{border:0;border-radius:8px;background:#111;color:#fff;padding:9px 12px;cursor:pointer}.client-drive-image{display:block;max-width:100%;max-height:70vh;margin:14px auto;object-fit:contain}.client-drive-pdf{width:100%;height:70vh;border:0;margin-top:12px}.client-drive-back{margin-bottom:12px}';
+  document.head.append(style);
 })();
