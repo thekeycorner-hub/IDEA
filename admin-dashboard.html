@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#111111" />
+  <meta name="description" content="ID+EA ERP Lite administration dashboard." />
+  <title>Admin Dashboard | ID+EA</title>
+  <link rel="icon" href="assets/idea-logo.png" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="admin-dashboard.css" />
+</head>
+<body class="admin-body">
+  <header class="admin-global-header">
+    <div class="container nav admin-nav-shell">
+      <button class="admin-menu-toggle" id="adminMenuToggle" type="button" aria-label="Open navigation" aria-expanded="false">☰</button>
+      <div class="admin-logo-link"><img src="assets/idea-logo.png" alt="ID+EA" class="admin-header-logo" /></div>
+      <button class="btn darkbtn admin-header-logout" id="adminLogout" type="button">Log out →</button>
+    </div>
+  </header>
+
+  <aside class="admin-sidebar" id="adminSidebar" aria-label="Admin dashboard navigation">
+    <div class="admin-sidebar-heading">ADMIN WORKSPACE</div>
+    <label class="admin-sidebar-project"><span>Current Project</span><select id="summaryProjectSelect"><option value="">Loading projects…</option></select></label>
+    <nav class="admin-nav" aria-label="Admin pages">
+      <button class="active" data-page="overview" type="button"><span>⌂</span>Dashboard</button>
+      <button data-page="projects" type="button"><span>▦</span>Projects</button>
+      <button data-page="tasks" type="button"><span>☷</span>Task Schedules</button>
+      <div class="admin-nav-caption">LIBRARIES</div>
+      <button data-page="party-library" type="button"><span>♧</span>Party Library</button>
+      <button data-page="material-library" type="button"><span>▧</span>Material Library</button>
+      <button data-page="workforce-library" type="button"><span>♙</span>Workforce Library</button>
+      <div class="admin-nav-caption">ADMIN MANAGEMENT</div>
+      <button data-page="users" type="button"><span>⚙</span>User management</button>
+    </nav>
+    <div class="admin-sidebar-user"><span class="admin-user-avatar">♙</span><span id="adminSidebarUser">Admin</span></div>
+  </aside>
+  <button class="admin-sidebar-scrim" id="adminSidebarScrim" type="button" aria-label="Close navigation"></button>
+
+  <div class="admin-main-shell">
+    <main class="admin-main">
+      <div class="admin-alert" id="adminAlert" role="status" aria-live="polite"></div>
+
+      <section class="admin-page active" data-view="overview">
+        <div id="projectSummaryContent" class="admin-summary-content"><div class="admin-empty">Select a project to view its data.</div></div>
+      </section>
+
+      <section class="admin-page" data-view="projects">
+        <div class="admin-page-intro"><div><h2>Projects</h2><p>Create and maintain project details and client access.</p></div><button class="admin-primary" data-add="project" type="button">＋ Add Project</button></div>
+        <div class="admin-card"><div class="admin-toolbar"><input id="projectSearch" type="search" placeholder="Search projects…" /><select id="projectStatusFilter"><option value="">All statuses</option><option>Active</option><option>Inactive</option><option>Completed</option><option>On Hold</option></select></div><div class="admin-table-wrap"><table><thead><tr><th>Project</th><th>Client</th><th>Location</th><th>Status</th><th>PMC / GST</th><th>Actions</th></tr></thead><tbody id="projectsRows"></tbody></table></div></div>
+      </section>
+
+      <section class="admin-page" data-view="tasks">
+        <div class="admin-page-intro"><div><h2>Task Schedules</h2><p>Add project tasks with independent start and end dates. Supervisors update progress in the app.</p></div></div>
+        <form class="admin-card admin-task-form" id="taskScheduleForm">
+          <h3>Add Work Schedule</h3>
+          <div class="admin-task-form-grid"><label>Task name<input id="taskTitle" required maxlength="160" placeholder="e.g. Ground floor slab casting" /></label><label>Description<textarea id="taskDescription" rows="2" maxlength="1000" placeholder="Optional task details"></textarea></label><label>Start date<input id="taskStartDate" type="date" required /></label><label>End date<input id="taskEndDate" type="date" required /></label></div>
+          <div class="admin-task-form-actions"><span id="taskFormStatus" role="status"></span><button class="admin-primary" id="saveTaskSchedule" type="submit">＋ Add Task</button></div>
+        </form>
+        <div class="admin-card"><div class="admin-card-head"><h3 id="taskListProject">Project Tasks</h3></div><div class="admin-table-wrap"><table><thead><tr><th>Task</th><th>Start date</th><th>End date</th><th>Status / Progress</th><th>Comments</th><th>Actions</th></tr></thead><tbody id="taskSchedulesRows"><tr><td class="empty" colspan="6">Select a project to view its tasks.</td></tr></tbody></table></div></div>
+      </section>
+
+      <section class="admin-page" data-view="library">
+        <div class="admin-page-intro"><div><h2 id="libraryPageTitle">Libraries</h2><p id="libraryPageDescription">Manage parties, materials, and workforce types.</p></div></div>
+        <div class="admin-library-grid" id="adminLibraryGrid" data-library-view="all">
+          <article class="admin-card admin-library-card" id="partyLibraryCard" data-library="party"><div class="admin-card-head"><h3>Party Library</h3><button class="admin-primary" data-add="party" type="button">＋ Add</button></div><div class="admin-toolbar"><input id="partySearch" type="search" placeholder="Search parties…" /><select id="partyStatusFilter"><option value="">All statuses</option><option>Active</option><option>Inactive</option></select></div><div class="admin-table-wrap"><table><thead><tr><th>Party</th><th>Type</th><th>Contact</th><th>Assigned Projects</th><th>Status</th><th>Actions</th></tr></thead><tbody id="partiesRows"></tbody></table></div></article>
+          <article class="admin-card admin-library-card" id="materialLibraryCard" data-library="material"><div class="admin-card-head"><h3>Material Library</h3><button class="admin-primary" data-add="material" type="button">＋ Add</button></div><div class="admin-toolbar"><input id="materialSearch" type="search" placeholder="Search materials…" /><select id="materialStatusFilter"><option value="">All statuses</option><option>Active</option><option>Inactive</option></select></div><div class="admin-table-wrap"><table><thead><tr><th>Material</th><th>Unit</th><th>Status</th><th>Actions</th></tr></thead><tbody id="materialsRows"></tbody></table></div></article>
+          <article class="admin-card admin-library-card" id="workforceLibraryCard" data-library="workforce"><div class="admin-card-head"><h3>Workforce Library</h3><button class="admin-primary" data-add="workforce" type="button">＋ Add</button></div><div class="admin-toolbar"><input id="workforceSearch" type="search" placeholder="Search workforce…" /><select id="workforceStatusFilter"><option value="">All statuses</option><option>Active</option><option>Inactive</option></select></div><div class="admin-table-wrap"><table><thead><tr><th>Workforce</th><th>Category</th><th>Unit</th><th>Default Rate</th><th>Status</th><th>Actions</th></tr></thead><tbody id="workforceRows"></tbody></table></div></article>
+        </div>
+      </section>
+
+      <section class="admin-page" data-view="users">
+        <div class="admin-page-intro"><div><h2>User Management</h2><p>Manage employee and admin accounts, reset passwords, and control access.</p></div><button class="admin-primary" data-add="user" type="button">＋ Add User</button></div>
+        <div class="admin-card"><div class="admin-toolbar"><input id="userSearch" type="search" placeholder="Search users…" /><select id="userStatusFilter"><option value="">All statuses</option><option>Active</option><option>Inactive</option></select></div><div class="admin-table-wrap"><table><thead><tr><th>User</th><th>Login ID</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead><tbody id="usersRows"></tbody></table></div></div>
+      </section>
+    </main>
+  </div>
+
+  <dialog class="admin-dialog" id="adminDialog"><form id="adminDialogForm"><div class="admin-dialog-head"><div><div class="admin-eyebrow" id="adminDialogKicker">MANAGEMENT</div><h2 id="adminDialogTitle">Edit record</h2></div><button class="admin-dialog-close" id="adminDialogClose" type="button" aria-label="Close">×</button></div><div class="admin-dialog-body" id="adminDialogBody"></div><div class="admin-dialog-error" id="adminDialogError" role="alert"></div><div class="admin-dialog-actions"><button class="admin-secondary" id="adminDialogCancel" type="button">Cancel</button><button class="admin-primary" id="adminDialogSave" type="submit">Save changes</button></div></form></dialog>
+  <dialog class="admin-dialog" id="taskEditDialog"><form id="taskEditForm"><div class="admin-dialog-head"><div><div class="admin-eyebrow">TASK SCHEDULE</div><h2 id="taskEditTitle">Edit task</h2></div><button class="admin-dialog-close" id="taskEditClose" type="button" aria-label="Close">×</button></div><div class="admin-dialog-body"><label class="admin-field full"><span>Task status / progress</span><select id="taskEditProgress"><option value="0">Not started · 0%</option><option value="10">10%</option><option value="20">20%</option><option value="30">30%</option><option value="40">40%</option><option value="50">50%</option><option value="60">60%</option><option value="70">70%</option><option value="80">80%</option><option value="90">90%</option><option value="100">Completed · 100%</option></select></label><label class="admin-field full"><span>Comments</span><textarea id="taskEditComments" rows="7" maxlength="5000" placeholder="Task comments"></textarea></label></div><div class="admin-dialog-error" id="taskEditError" role="alert"></div><div class="admin-dialog-actions"><button class="admin-secondary" id="taskEditCancel" type="button">Cancel</button><button class="admin-primary" id="taskEditSave" type="submit">Save task</button></div></form></dialog>
+  <dialog class="admin-secret-dialog" id="adminSecretDialog"><div class="admin-secret-content"><div class="admin-eyebrow">COPY NOW</div><h2 id="adminSecretTitle">One-time access details</h2><p id="adminSecretMessage"></p><code id="adminSecretValue"></code><div class="admin-secret-actions"><button class="admin-secondary" id="adminCopySecret" type="button">Copy</button><button class="admin-primary" id="adminCloseSecret" type="button">I saved it</button></div></div></dialog>
+  <dialog class="admin-records-dialog" id="adminRecordsDialog" aria-labelledby="adminRecordsTitle"><div class="admin-records-head"><div class="admin-records-title-group"><h2 id="adminRecordsTitle">Records</h2><select id="adminRecordsMonthFilter" aria-label="Filter records by month" hidden></select></div><button type="button" class="admin-dialog-close" id="adminRecordsClose" aria-label="Close">×</button></div><div class="admin-records-body" id="adminRecordsBody"></div></dialog>
+  <script src="site-config.js"></script>
+  <script src="admin-dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#111111" />
+  <meta name="description" content="Daily site progress report for ID+EA." />
+  <title>Daily Site Report | ID+EA</title>
+  <link rel="icon" href="assets/idea-logo.png" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="reports.css" />
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a aria-label="ID+EA home" href="index.html#home"><img class="logo" src="assets/idea-logo.png" alt="ID+EA" /></a>
+      <nav class="navlinks site-nav" aria-label="Main navigation">
+        <a href="index.html#home">Home</a><a href="index.html#about">About</a><a href="index.html#services">Services</a>
+        <a href="index.html#projects">Projects</a><a href="index.html#tracking">Tech Tracking</a><a href="index.html#contact">Contact</a>
+      </nav>
+      <a class="btn darkbtn call-link" href="login.html">Login →</a>
+      <button class="mobile-menu mobile-toggle" id="mobileToggle" type="button" aria-label="Open menu" aria-expanded="false">☰</button>
+    </div>
+    <nav class="mini-links" id="mobileLinks" aria-label="Mobile navigation" hidden>
+      <a href="index.html#home">Home</a><a href="index.html#about">About</a><a href="index.html#services">Services</a>
+      <a href="index.html#projects">Projects</a><a href="index.html#tracking">Tech Tracking</a><a href="index.html#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main class="access-main">
+    <section class="report-workspace" id="reportWorkspace" aria-label="Daily site report">
+      <div class="report-workspace-head">
+        <div><div class="label"><span class="dot"></span>DAILY SITE REPORT</div><h1>Daily site progress</h1></div>
+        <div class="report-user"><span id="reportUserName"></span><button class="text-action" id="reportLogoutButton" type="button">Log out</button></div>
+      </div>
+      <div class="report-selection report-card">
+        <label><span>Report date</span><input id="reportDate" type="date" required /></label>
+        <label><span>Project</span><select id="reportProject" required><option value="">Select Project</option></select></label>
+      </div>
+      <div class="report-status" id="reportStatus" role="status">Select a project to load its report.</div>
+
+      <section class="report-card report-section" aria-labelledby="workforceTitle">
+        <div class="report-section-head"><h2 id="workforceTitle">WORKFORCE</h2><button class="text-action add-action" data-add="workforce" type="button">+ Add</button></div>
+        <div class="record-list" id="workforceList"></div>
+        <div class="report-total"><span>Total Operational Cost</span><strong id="workforceTotal">₹0</strong></div>
+      </section>
+
+      <section class="report-card report-section" aria-labelledby="materialsTitle">
+        <div class="report-section-head"><h2 id="materialsTitle">MATERIALS</h2><button class="text-action add-action" data-add="material" type="button">+ Add</button></div>
+        <div class="record-list" id="materialList"></div>
+        <div class="report-total"><span>Total Material Cost</span><strong id="materialTotal">₹0</strong></div>
+      </section>
+
+      <section class="report-card report-section" aria-labelledby="cashFlowTitle">
+        <div class="report-section-head"><h2 id="cashFlowTitle">CASH FLOW IN / OUT</h2><button class="text-action add-action" data-add="cashFlow" type="button">+ Add</button></div>
+        <div class="record-list" id="cashFlowList"></div>
+        <div class="report-total report-cash-totals"><span>Cash In <strong id="cashInTotal">₹0</strong></span><span>Cash Out <strong id="cashOutTotal">₹0</strong></span></div>
+      </section>
+
+      <section class="report-card report-section" aria-labelledby="remarksTitle">
+        <div class="report-section-head"><h2 id="remarksTitle">REMARKS</h2></div>
+        <label class="remarks-field"><span>Daily site remarks</span><textarea id="reportRemarks" rows="4" placeholder="Describe today’s progress..."></textarea></label>
+      </section>
+
+      <div class="report-error" id="reportFormError" role="alert" aria-live="polite"></div>
+      <div class="report-save-bar"><span id="reportSaveHint">Choose a project and date to begin.</span><button class="submit" id="saveReportButton" type="button" disabled>Save Report</button></div>
+    </section>
+  </main>
+
+  <dialog class="entry-dialog" id="entryDialog">
+    <form id="entryForm" method="dialog">
+      <div class="dialog-head"><h2 id="entryDialogTitle">Add entry</h2><button class="dialog-close" id="entryDialogClose" type="button" aria-label="Close">×</button></div>
+      <div class="dialog-fields" id="entryFields"></div>
+      <div class="dialog-actions"><button class="btn lightbtn" id="entryCancel" type="button">Cancel</button><button class="btn darkbtn" type="submit">Save entry</button></div>
+    </form>
+  </dialog>
+
+  <script src="script.js"></script>
+  <script src="site-config.js"></script>
+  <script src="reports-login.js"></script>
+</body>
+</html>

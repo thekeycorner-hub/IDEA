@@ -2,16 +2,17 @@
 
 <html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>Client Dashboard | ID+EA</title><meta content="#111111" name="theme-color"/><meta content="ID+EA private client project tracking dashboard" name="description"/>
 <link href="style.css" rel="stylesheet"/><link href="client-dashboard.css" rel="stylesheet"/></head><body>
-<header class="website-header"><div class="container nav"><a aria-label="ID+EA Home" href="index.html#home"><img alt="ID+EA Tech-Enabled Construction Company" class="logo" src="assets/idea-logo.png"/></a><nav aria-label="Main navigation" class="navlinks" id="websiteNav"><a href="index.html#home">Home</a><a href="index.html#about">About</a><a href="index.html#services">Services</a><a href="index.html#projects">Projects</a><a href="index.html#tracking">Tech Tracking</a><a href="index.html#contact">Contact</a></nav><a class="btn darkbtn website-call" href="tel:+919951929950">Call Now →</a><button aria-controls="mobileWebsiteNav" aria-expanded="false" aria-label="Open navigation" class="mobile-menu" id="websiteMenu" type="button">☰</button></div><nav aria-label="Mobile main navigation" class="website-mobile-links" hidden="" id="mobileWebsiteNav"><a href="index.html#home">Home</a><a href="index.html#about">About</a><a href="index.html#services">Services</a><a href="index.html#projects">Projects</a><a href="index.html#tracking">Tech Tracking</a><a href="index.html#contact">Contact</a></nav></header>
+<header class="website-header"><div class="container nav"><a aria-label="ID+EA Home" href="index.html#home"><img alt="ID+EA Tech-Enabled Construction Company" class="logo" src="assets/idea-logo.png"/></a><nav aria-label="Main navigation" class="navlinks" id="websiteNav"><a href="index.html#home">Home</a><a href="index.html#about">About</a><a href="index.html#services">Services</a><a href="index.html#projects">Projects</a><a href="index.html#tracking">Tech Tracking</a><a href="index.html#contact">Contact</a></nav><a class="btn darkbtn website-call" href="login.html">Login →</a><button class="btn darkbtn client-logout-button" id="clientHeaderLogout" type="button" hidden>Log out →</button><button aria-controls="mobileWebsiteNav" aria-expanded="false" aria-label="Open navigation" class="mobile-menu" id="websiteMenu" type="button">☰</button></div><nav aria-label="Mobile main navigation" class="website-mobile-links" hidden="" id="mobileWebsiteNav"><a href="index.html#home">Home</a><a href="index.html#about">About</a><a href="index.html#services">Services</a><a href="index.html#projects">Projects</a><a href="index.html#tracking">Tech Tracking</a><a href="index.html#contact">Contact</a></nav></header>
 <main class="wrap dashboard-redesign">
 <div class="warning" id="dataWarning" role="status"></div>
 <section class="card project-simple" id="project">
-  <div class="project-ident"><div class="eyebrow"><span class="dot"></span>CLIENT DASHBOARD</div><div class="project-title-line"><h1 id="projectName">Loading project...</h1><span class="project-type" id="projectType">—</span><span class="project-state" id="projectStatus"></span></div><p class="project-subline"><span id="projectClient">—</span><span class="sep">|</span><span id="projectAddress">—</span></p></div>
-  <div class="project-links-panel">
-    <div class="project-tagline" aria-label="Design. Build. Track. Deliver.">
-      <div class="project-tagline-bars" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-      <div class="project-tagline-text">Design. Build. Track. Deliver.</div>
-    </div>
+  <div class="project-ident">
+    <div class="eyebrow"><span class="dot"></span>CLIENT DASHBOARD</div>
+    <div class="project-title-line"><h1 id="projectName">Loading project...</h1><span class="project-type" id="projectType">—</span><span class="project-state" id="projectStatus"></span></div>
+    <p class="project-subline"><span id="projectClient">—</span><span class="sep">|</span><span id="projectAddress">—</span></p>
+    <p class="project-subline">Project By: <span id="projectPmcContractor">—</span></p>
+    <p class="project-subline">Service charge: <span id="projectServiceCharge">—</span></p>
+    <p class="project-subline">Project start date: <span id="projectStartDate">—</span></p>
     <nav class="project-drive-actions" aria-label="Project files">
       <button class="drive-link" type="button" id="openDriveDrawings" aria-label="View Drawings">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 8 4-4 12 12-4 4L4 8Z"/><path d="m8 8 2-2m0 5 2-2m1 5 2-2m1 5 2-2"/></svg>
@@ -21,6 +22,10 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z"/><path d="M9 8h6m-6 4h6"/></svg>
         <span>Bills</span>
       </button>
+      <button class="drive-link" type="button" id="openTaskSchedule" aria-label="View Task Schedule">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5h11M9 12h11M9 19h11"/><path d="m3.5 5 .9.9L6.5 3.8M3.5 12l.9.9 2.1-2.1M3.5 19l.9.9 2.1-2.1"/></svg>
+        <span>Tasks</span>
+      </button>
       <div class="project-settings-control" id="projectSettingsControl">
         <button class="drive-link" type="button" id="projectSettingsToggle" aria-label="Settings" aria-haspopup="true" aria-expanded="false" aria-controls="projectSettingsMenu">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5a2 2 0 0 1 1.9 1.4l.3.9a7.7 7.7 0 0 1 1.4.8l.9-.2a2 2 0 0 1 2.1 1l.9 1.6a2 2 0 0 1-.3 2.3l-.6.7v1.6l.6.7a2 2 0 0 1 .3 2.3l-.9 1.6a2 2 0 0 1-2.1 1l-.9-.2a7.7 7.7 0 0 1-1.4.8l-.3.9a2 2 0 0 1-1.9 1.4h-1.8a2 2 0 0 1-1.9-1.4l-.3-.9a7.7 7.7 0 0 1-1.4-.8l-.9.2a2 2 0 0 1-2.1-1l-.9-1.6a2 2 0 0 1 .3-2.3l.6-.7v-1.6l-.6-.7a2 2 0 0 1-.3-2.3l.9-1.6a2 2 0 0 1 2.1-1l.9.2a7.7 7.7 0 0 1 1.4-.8l.3-.9a2 2 0 0 1 1.9-1.4Z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -28,12 +33,15 @@
         </button>
         <div class="project-settings-menu" id="projectSettingsMenu" role="menu" hidden>
           <button type="button" id="openChangeAccessCode" role="menuitem">Change Access Code</button>
-          <button type="button" id="clientLogout" role="menuitem">Logout</button>
         </div>
       </div>
     </nav>
   </div>
+  <div class="project-links-panel project-image-panel" id="projectImagePanel" hidden>
+    <img id="projectImage" class="project-image" alt="Project image" />
+  </div>
 </section>
+<section class="card section task-schedule-section" id="taskSchedules"><div class="client-task-columns"><div class="client-in-progress"><h2 class="client-task-column-title">IN-PROGRESS TASKS</h2><div class="client-task-carousel"><button type="button" id="taskCarouselPrev" class="task-carousel-arrow" aria-label="Show previous tasks" hidden>‹</button><div id="clientTaskSchedules" class="client-task-list"><p class="task-empty">Loading scheduled tasks…</p></div><button type="button" id="taskCarouselNext" class="task-carousel-arrow" aria-label="Show more tasks" hidden>›</button></div></div><div class="client-next-week"><h2 class="client-task-column-title">NEXT WEEK TASKS</h2><div id="clientNextWeekTasks" class="client-next-week-list"><p class="task-empty">Loading tasks…</p></div></div></div></section>
 <section class="card section" id="monthly"><div class="sectionhead"><h2>SUMMARY</h2><select id="monthSelect" aria-label="Select Total Project or reporting month"><option value="all">Total Project</option></select></div>
  <div class="summary-rows"><div><span>Total Expenditure</span><strong id="monthlyTotal">—</strong></div><div><span>Material Bill Amount</span><strong id="materialTotal">—</strong></div><div><span>Workforce Bill</span><strong id="workforceTotal">—</strong></div><div><span id="serviceChargeLabel">Service Charge</span><strong id="serviceTotal">—</strong></div></div>
  <p class="summary-note" id="summaryBasis">Total expenditure includes material and workforce bills only. Service charge is calculated separately.</p>
@@ -46,10 +54,10 @@
 <div class="bottomgrid"><section class="card listcard" id="remarks"><div class="sectionhead"><h2>REMARKS</h2><a href="#" data-view="remarks">View All</a></div><div class="scroll"><table><thead><tr><th>Date</th><th>Remark</th></tr></thead><tbody id="remarksBody"></tbody></table></div></section>
 <section class="card section" id="cash"><div class="sectionhead"><h2>CASH FLOW</h2></div><div class="cash-simple"><div><span>Cash IN</span><strong class="good" id="cashIn">—</strong></div><div><span>Cash OUT</span><strong class="bad" id="cashOut">—</strong></div></div><p class="subtle-note">Cash movements are separate from accrued expenditure.</p></section></div>
 
-<div class="portal-footer"><span>ID+EA <b>·</b> TECHNOLOGY-ENABLED CONSTRUCTION</span><span>Design. Build. Track. Deliver.</span></div>
-<p class="disclaimer" id="disclaimer">Project records are loaded securely from your Google Sheets dashboard.</p></main>
-<nav class="mobile-nav"><a href="#project">Project</a><a href="#monthly">Summary</a><a href="#materials">Materials</a><a href="#parties">Parties</a><a href="#cash">Cash Flow</a></nav>
-<div aria-label="Record details" aria-modal="true" class="modal" id="modal" role="dialog"><div class="modal-panel"><div class="modal-top"><h2 id="modalTitle"></h2><button class="close" id="closeModal" type="button">Close ✕</button></div><div class="scroll" id="modalBody"></div></div></div>
+<p class="disclaimer" id="disclaimer">Project records are loaded securely from your Google Sheets dashboard.</p>
+<div class="portal-footer"><span>ID+EA <b>·</b> TECHNOLOGY-ENABLED CONSTRUCTION</span><div class="portal-footer-tagline" aria-label="Design. Build. Track. Deliver."><div class="project-tagline-bars" aria-hidden="true"><span></span><span></span><span></span><span></span></div><span class="project-tagline-text">Design. Build. Track. Deliver.</span></div></div></main>
+<nav class="mobile-nav"><a href="#project">Project</a><a href="#taskSchedules">Tasks</a><a href="#monthly">Summary</a><a href="#materials">Materials</a><a href="#parties">Parties</a><a href="#cash">Cash Flow</a></nav>
+<div aria-label="Record details" aria-modal="true" class="modal" id="modal" role="dialog"><div class="modal-panel"><div class="modal-top"><h2 id="modalTitle"></h2><select id="modalMonthFilter" aria-label="Filter records by month" hidden></select><button class="close" id="closeModal" type="button">Close ✕</button></div><div class="scroll" id="modalBody"></div></div></div>
 <div id="changeAccessDialog" class="client-access-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="changeAccessTitle">
   <div class="client-access-panel">
     <h2 id="changeAccessTitle">Change Project Access Code</h2>

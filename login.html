@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#111111" />
+  <meta name="description" content="Choose Client or Employee/Admin access for ID+EA." />
+  <title>Login | ID+EA</title>
+  <link rel="icon" href="assets/idea-logo.png" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="reports.css" />
+</head>
+<body class="login-page">
+  <header>
+    <div class="container nav">
+      <a aria-label="ID+EA home" href="index.html#home"><img class="logo" src="assets/idea-logo.png" alt="ID+EA" /></a>
+      <nav class="navlinks site-nav" aria-label="Main navigation">
+        <a href="index.html#home">Home</a><a href="index.html#about">About</a><a href="index.html#services">Services</a>
+        <a href="index.html#projects">Projects</a><a href="index.html#tracking">Tech Tracking</a><a href="index.html#contact">Contact</a>
+      </nav>
+      <button class="mobile-menu mobile-toggle" id="mobileToggle" type="button" aria-label="Open menu" aria-expanded="false">☰</button>
+    </div>
+    <nav class="mini-links" id="mobileLinks" aria-label="Mobile navigation" hidden>
+      <a href="index.html#home">Home</a><a href="index.html#about">About</a><a href="index.html#services">Services</a>
+      <a href="index.html#projects">Projects</a><a href="index.html#tracking">Tech Tracking</a><a href="index.html#contact">Contact</a>
+    </nav>
+  </header>
+  <main class="access-main">
+    <div class="access-layout reports-login-layout">
+      <aside class="access-intro">
+        <div>
+          <div class="access-kicker">ID+EA · Portal Access</div>
+          <h1>Choose your<br />login type.</h1>
+          <p>Select the account type you use to access project information.</p>
+        </div>
+        <div>
+          <div class="access-stripes" aria-hidden="true"><span style="background:var(--orange)"></span><span style="background:var(--cyan)"></span><span style="background:var(--yellow)"></span><span style="background:var(--pink)"></span></div>
+          <p>Design. Build. Track. Deliver.</p>
+        </div>
+      </aside>
+      <section class="access-form" aria-label="Portal login">
+        <div class="label"><span class="dot"></span>PORTAL ACCESS</div>
+        <div id="loginChooser">
+          <h2 style="margin-top:18px">How would you like to sign in?</h2>
+          <p>Clients use a project access code. Employees and admins use their IDEA ERP Lite app credentials.</p>
+          <div class="login-destination-options">
+            <button class="login-destination" type="button" data-show-login="client"><strong>Client</strong><span>Choose your project and enter your access code</span><b>Continue →</b></button>
+            <button class="login-destination" type="button" data-show-login="employee"><strong>Employee / Admin</strong><span>Sign in with your app Login ID and password</span><b>Continue →</b></button>
+          </div>
+        </div>
+        <div class="login-form-panel" id="clientLoginPanel" hidden>
+          <button class="login-back" type="button" data-back-login>← Login options</button>
+          <div class="label"><span class="dot"></span>CLIENT ACCESS</div>
+          <h2 style="margin-top:18px">Open Project Dashboard</h2>
+          <p>Select your project and enter your assigned access code.</p>
+          <form id="accessForm">
+            <label class="field"><span>Select Project</span><select id="projectSelect" required><option value="">Select your project</option></select></label>
+            <label class="field"><span>Project Access Code</span><input id="accessCode" type="password" autocomplete="off" minlength="4" placeholder="Enter access code" required /></label>
+            <div class="error" id="error" role="alert" aria-live="polite"></div>
+            <button class="submit" id="submitBtn" type="submit">Open Dashboard →</button>
+          </form>
+          <div class="demo-info" id="demoInfo" hidden><strong>Preview mode only:</strong> Select the sample project and use code <strong>DEMO123</strong>. This is not secure client authentication; live access needs server-side code verification.</div>
+          <div class="hint">Need access? Contact the ID+EA project team to request your project code.</div>
+        </div>
+        <div class="login-form-panel" id="employeeLoginPanel" hidden>
+          <button class="login-back" type="button" data-back-login>← Login options</button>
+          <div class="label"><span class="dot"></span>EMPLOYEE / ADMIN LOGIN</div>
+          <h2 style="margin-top:18px">Welcome back</h2>
+          <p>Use the same Login ID and password as the IDEA ERP Lite app.</p>
+          <form id="reportLoginForm">
+            <label class="field" for="reportUsername"><span>Login ID</span><input id="reportUsername" name="username" autocomplete="username" required /></label>
+            <label class="field" for="reportPassword"><span>Password</span><input id="reportPassword" name="password" type="password" autocomplete="current-password" required /></label>
+            <div class="error" id="reportLoginError" role="alert" aria-live="polite"></div>
+            <button class="submit" id="reportLoginButton" type="submit">Sign in →</button>
+          </form>
+          <div class="hint">Access is checked against your active IDEA ERP Lite user account. Your account permissions determine the features available.</div>
+        </div>
+      </section>
+    </div>
+  </main>
+  <script src="script.js"></script>
+  <script src="site-config.js"></script>
+  <script src="reports-login.js"></script>
+  <script src="client-access.js"></script>
+  <script src="login-page.js"></script>
+</body>
+</html>

@@ -9,12 +9,42 @@
  */
 const CONFIG={USE_DEMO:!window.IDEA_SITE_CONFIG?.API_URL,API_URL:window.IDEA_SITE_CONFIG?.API_URL||''};
 const params=new URLSearchParams(location.search);let projectId=params.get('projectId')||'P001';const portalToken=sessionStorage.getItem('ideaClientAccessToken')||'';
+const clientSessionActive=(portalToken&&sessionStorage.getItem('ideaClientProjectId')===projectId)||sessionStorage.getItem('ideaPreviewAccess')==='yes';
+if(clientSessionActive){document.body.classList.add('authenticated-view');const headerLogout=document.getElementById('clientHeaderLogout');if(headerLogout)headerLogout.hidden=false;}
 const amount=v=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(Number(v)||0);
 const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const demo={project:{id:'P001',name:'Green Valley Villas',client:'ABC Constructions',location:'Kochi, Kerala',pmcPercent:10,gstPercent:18,status:'Ongoing',image:'assets/project-placeholder.svg',startDate:'01 Jan 2024',completionDate:'31 Dec 2026',type:'PMC',siteManager:'Site Manager',contact:'—'},parties:[{name:'Kerala Hardware',type:'Supplier',contact:'—',balance:120000},{name:'Metro Steel Traders',type:'Supplier',contact:'—',balance:80000},{name:'KM Transport',type:'Transport',contact:'—',balance:25000},{name:'Site Workforce Group',type:'Workforce',contact:'—',balance:18000},{name:'Kumar Electricals',type:'Contractor',contact:'—',balance:12000}],months:{'2026-10':{materials:[{name:'Cement',quantity:1250,unit:'Bags',total:450000},{name:'Steel',quantity:3200,unit:'Kg',total:120000},{name:'Bricks',quantity:18000,unit:'Nos',total:50000},{name:'M Sand',quantity:50,unit:'Ton',total:35000},{name:'P Sand',quantity:40,unit:'Ton',total:25000}],workforceBillAmount:325000,otherEligibleExpenses:243500,cashIn:1500000,cashOut:1248500,reports:[{date:'08 Oct 2026',workforce:12,materialCost:65000,expenditure:85000},{date:'07 Oct 2026',workforce:10,materialCost:52000,expenditure:70000},{date:'06 Oct 2026',workforce:14,materialCost:78000,expenditure:105000},{date:'05 Oct 2026',workforce:11,materialCost:60000,expenditure:82000},{date:'04 Oct 2026',workforce:13,materialCost:72000,expenditure:90000}],remarks:[{date:'08 Oct 2026',text:'Column concreting completed in Block A. Steel received for Block B.'},{date:'07 Oct 2026',text:'Labour count reduced due to rain. Material unloading completed.'},{date:'06 Oct 2026',text:'Plumbing work underway. Electrical conduits placed.'},{date:'05 Oct 2026',text:'Site cleaning and shuttering work completed.'},{date:'04 Oct 2026',text:'Sand delivery delayed. Internal wall work continued.'}]},'2026-09':{materials:[{name:'Cement',quantity:1000,unit:'Bags',total:360000},{name:'Sand',quantity:45,unit:'Ton',total:65000}],workforceBillAmount:290000,otherEligibleExpenses:105000,cashIn:900000,cashOut:800000,reports:[{date:'29 Sep 2026',workforce:10,materialCost:40000,expenditure:72000}],remarks:[{date:'29 Sep 2026',text:'Foundation inspection completed.'}]}}};
-let data=demo;let currentMonth='';
+let data=demo;let currentMonth='';let projectTasks=[];
 function setWarning(message){const e=document.getElementById('dataWarning');e.textContent=message;e.classList.toggle('show',Boolean(message));}
-async function fetchData(){if(CONFIG.USE_DEMO){if(sessionStorage.getItem('ideaPreviewAccess')!=='yes')throw Error('Open client-access.html to enter preview mode.');return demo;}if(!CONFIG.API_URL)throw Error('Configure the Apps Script dashboard endpoint.');if(sessionStorage.getItem('ideaClientProjectId')!==projectId)throw Error('Please sign in to this project first.');const url=new URL(CONFIG.API_URL);url.searchParams.set('action','projectDashboard');url.searchParams.set('projectId',projectId);url.searchParams.set('accessToken',portalToken);if(!portalToken)throw Error('Please sign in through client-access.html first.');const r=await fetch(url.toString());if(!r.ok)throw Error('Dashboard request failed ('+r.status+')');const result=await r.json();if(result.success===false)throw Error(result.message||'Project unavailable');if(!result.project||!result.months)throw Error('Unexpected dashboard response');return result;}
+function taskDate(value){const text=String(value||'');const match=text.match(/^(\d{4})-(\d{2})-(\d{2})/);if(match)return new Date(Number(match[1]),Number(match[2])-1,Number(match[3]));const slash=text.match(/^(\d{1,2})[/. -](\d{1,2})[/. -](\d{4})$/);if(slash)return new Date(Number(slash[3]),Number(slash[2])-1,Number(slash[1]));const date=new Date(value);return Number.isNaN(date.valueOf())?null:new Date(date.getFullYear(),date.getMonth(),date.getDate());}
+function taskStatus(task){if(Number(task.progress)>=100)return 'Completed';const start=taskDate(task.startDate),today=new Date();today.setHours(0,0,0,0);return start&&start>today?'Upcoming':'Ongoing';}
+function taskDelayed(task){const end=taskDate(task.endDate),today=new Date();today.setHours(0,0,0,0);return Number(task.progress)<100&&end&&end<today;}
+function taskDateLabel(value){const date=taskDate(value);return date?`${String(date.getDate()).padStart(2,'0')}/${String(date.getMonth()+1).padStart(2,'0')}/${date.getFullYear()}`:String(value||'—');}
+function recentTaskComments(value){const text=String(value||'').trim();if(!text)return [];const entries=text.split(/\n(?=\d{2}\/\d{2}\/\d{4}(?:\s+\d{2}:\d{2})?\s+·\s)/).map(item=>item.trim()).filter(Boolean);return (entries.length?entries:text.split(/\n+/).map(item=>item.trim()).filter(Boolean)).slice(-2).map(entry=>{const match=entry.match(/^(\d{2}\/\d{2}\/\d{4})(?:\s+\d{2}:\d{2})?\s+·\s*.*?:\s*([\s\S]*)$/);return match?{date:match[1],text:match[2].trim()}:{date:'',text:entry};});}
+function syncTaskCarouselButtons(){const list=document.getElementById('clientTaskSchedules'),prev=document.getElementById('taskCarouselPrev'),next=document.getElementById('taskCarouselNext');if(!list||!prev||!next)return;const canScroll=list.scrollWidth>list.clientWidth+2,carousel=list.closest('.client-task-carousel');prev.hidden=next.hidden=!canScroll;carousel?.classList.toggle('has-overflow',canScroll);prev.disabled=list.scrollLeft<=2;next.disabled=list.scrollLeft+list.clientWidth>=list.scrollWidth-2;}
+async function fetchData(){if(CONFIG.USE_DEMO){if(sessionStorage.getItem('ideaPreviewAccess')!=='yes')throw Error('Open login.html to enter preview mode.');return demo;}if(!CONFIG.API_URL)throw Error('Configure the Apps Script dashboard endpoint.');if(sessionStorage.getItem('ideaClientProjectId')!==projectId)throw Error('Please sign in to this project first.');const url=new URL(CONFIG.API_URL);url.searchParams.set('action','projectDashboard');url.searchParams.set('projectId',projectId);url.searchParams.set('accessToken',portalToken);if(!portalToken)throw Error('Please sign in through login.html first.');const r=await fetch(url.toString());if(!r.ok)throw Error('Dashboard request failed ('+r.status+')');const result=await r.json();if(result.success===false)throw Error(result.message||'Project unavailable');if(!result.project||!result.months)throw Error('Unexpected dashboard response');return result;}
+async function loadTaskSchedules(){
+ const target=document.getElementById('clientTaskSchedules');
+ const nextWeek=document.getElementById('clientNextWeekTasks');
+ if(CONFIG.USE_DEMO){target.innerHTML='<p class="task-empty">No tasks scheduled for this project yet.</p>';nextWeek.innerHTML='<p class="task-empty">No upcoming tasks.</p>';return;}
+ if(!portalToken||sessionStorage.getItem('ideaClientProjectId')!==projectId){target.innerHTML='<p class="task-empty">Sign in to view this project’s task schedule.</p>';nextWeek.innerHTML='';return;}
+ try{
+  const url=new URL(CONFIG.API_URL);url.searchParams.set('action','projectTasks');url.searchParams.set('projectId',projectId);url.searchParams.set('accessToken',portalToken);
+  const response=await fetch(url.toString(),{cache:'no-store'});if(!response.ok)throw Error('Task schedule request failed ('+response.status+')');
+  const result=await response.json();if(!result.success)throw Error(result.message||'Unable to load tasks');
+  projectTasks=result.tasks||[];
+  const tasks=projectTasks.filter(task=>taskStatus(task)==='Ongoing');
+  target.innerHTML=tasks.length?tasks.map(task=>{
+   const progress=Math.max(0,Math.min(100,Number(task.progress)||0));
+  const comments=recentTaskComments(task.comments);
+  return '<article class="client-task-card'+(taskDelayed(task)?' delayed':'')+'"><div class="client-task-heading"><h3>'+safe(task.title)+'</h3><span class="task-daily-status'+(taskDelayed(task)?' delayed':'')+'">'+(taskDelayed(task)?'Delayed':'In progress')+'</span></div><div class="client-task-progress"><div class="client-task-track"><i style="width:'+progress+'%"></i></div><strong>'+progress+'%</strong></div><div class="client-task-dates"><span>Start: '+safe(taskDateLabel(task.startDate))+'</span><span>End: '+safe(taskDateLabel(task.endDate))+'</span></div><div class="client-task-comments"><b>Comments</b>'+(comments.length?'<ul class="client-task-comment-list">'+comments.map(item=>'<li>'+(item.date?'<time>'+safe(item.date)+'</time>':'')+'<span>'+safe(item.text)+'</span></li>').join('')+'</ul>':'<span class="client-task-no-comments">No comments yet</span>')+'</div></article>';
+  }).join(''):'<p class="task-empty">No tasks are currently in progress.</p>';
+  target.scrollLeft=0;requestAnimationFrame(syncTaskCarouselButtons);
+  const today=new Date();today.setHours(0,0,0,0);const daysUntilSunday=(7-today.getDay())%7||7;const weekStart=new Date(today);weekStart.setDate(weekStart.getDate()+daysUntilSunday);const weekEnd=new Date(weekStart);weekEnd.setDate(weekEnd.getDate()+6);
+  const next=projectTasks.filter(task=>taskStatus(task)==='Upcoming').filter(task=>{const start=taskDate(task.startDate);return start&&start>=weekStart&&start<=weekEnd;});
+  nextWeek.innerHTML=next.length?next.map(task=>'<div class="client-next-week-item"><strong>'+safe(task.title)+'</strong><span>'+safe(taskDateLabel(task.startDate))+'</span></div>').join(''):'<p class="task-empty">No tasks scheduled Sunday through Saturday.</p>';
+ }catch(error){target.innerHTML='<p class="task-empty">'+safe(error.message||'Unable to load task schedule.')+'</p>';nextWeek.innerHTML='';}
+}
 function num(v){return Number(v)||0;}
 function sum(xs,k){return (xs||[]).reduce((t,x)=>t+num(x[k]),0);}
 function calc(m){const mat=sum(m.materials,'total'),workforce=num(m.workforceBillAmount);const expenditure=mat+workforce,pmc=num(data?.project?.pmcPercent),gst=num(data?.project?.gstPercent),service=expenditure*(pmc/100)*(1+gst/100);return {mat,workforce,expenditure,service,total:expenditure,cashIn:num(m.cashIn),cashOut:num(m.cashOut)};}
@@ -25,7 +55,31 @@ function fill(id,value){const el=document.getElementById(id);if(el)el.textConten
 function td(value){return '<td>'+safe(value)+'</td>';}
 function makeRow(values){return '<tr>'+values.map(td).join('')+'</tr>';}
 function table(id,rows,colspan){document.getElementById(id).innerHTML=rows.length?rows.join(''):'<tr><td class="empty" colspan="'+colspan+'">No records for this selection</td></tr>';}
-function showProject(){const p=data.project;fill('projectName',p.name||'Project');fill('projectType',p.scope||p.type||'Project');fill('projectStatus',p.status||'');fill('projectClient',p.client||'Client not specified');fill('projectAddress',p.location||'Address not specified');}
+function projectImageSource(value){
+ const raw=String(value||'').trim();if(!raw)return {urls:[],driveId:''};
+ try{
+  const url=new URL(raw,location.href);if(!['http:','https:'].includes(url.protocol))return {urls:[],driveId:''};
+  if(/(^|\.)drive\.google\.com$|(^|\.)drive\.usercontent\.google\.com$/i.test(url.hostname)){
+   const id=url.pathname.match(/\/file\/d\/([^/]+)/)?.[1]||url.searchParams.get('id');
+   if(id)return {driveId:id,urls:['https://drive.google.com/thumbnail?id='+encodeURIComponent(id)+'&sz=w1200','https://lh3.googleusercontent.com/d/'+encodeURIComponent(id),'https://drive.google.com/uc?export=view&id='+encodeURIComponent(id)]};
+  }
+  return {urls:[url.href],driveId:''};
+ }catch(_){return {urls:[],driveId:''};}
+}
+async function showProject(){
+ const p=data.project;fill('projectName',p.name||'Project');fill('projectType',p.scope||p.type||'Project');fill('projectStatus',p.status||'');fill('projectClient',p.client||'Client not specified');fill('projectAddress',p.location||'Address not specified');fill('projectPmcContractor',p.pmcContractor||'—');fill('projectServiceCharge',`${num(p.pmcPercent)}% + ${num(p.gstPercent)}% GST`);fill('projectStartDate',p.startDate||'—');
+ const source=projectImageSource(p.image||p.imageUrl||p.Imageurl);const image=document.getElementById('projectImage'),panel=document.getElementById('projectImagePanel');
+ image.alt=(p.name||'Project')+' image';image.onerror=null;image.removeAttribute('src');
+ if(source.driveId&&portalToken&&CONFIG.API_URL){
+  try{
+   const url=new URL(CONFIG.API_URL);url.searchParams.set('action','clientProjectImage');url.searchParams.set('projectId',p.id||projectId);url.searchParams.set('accessToken',portalToken);
+   const response=await fetch(url.toString(),{cache:'no-store'});const result=await response.json();
+   if(response.ok&&result.success&&result.dataUrl){panel.hidden=false;image.src=result.dataUrl;return;}
+  }catch(_){/* Fall back to a directly viewable image URL below. */}
+ }
+ if(source.urls.length){let next=0;image.onerror=()=>{if(next<source.urls.length)image.src=source.urls[next++];else panel.hidden=true;};panel.hidden=false;image.src=source.urls[next++];}
+ else panel.hidden=true;
+}
 const partyLedgerCache=new Map();
 function partyRows(parties){return parties.map(p=>{
  const balance=num(p.balance),balanceClass=balance<-.005?'advance':Math.abs(balance)<.005?'settled':'';
@@ -55,6 +109,7 @@ async function fetchPartyLedger(party){
 }
 let partyBalanceSort = 'desc'; // First click reverses to low-to-high.
 function showAllParties(){
+ const monthFilter=document.getElementById('modalMonthFilter');monthFilter.hidden=true;monthFilter.onchange=null;
  const parties=(data.parties||[]).map((party,index)=>({party,index})).sort((a,b)=>{
   const difference=num(a.party.balance)-num(b.party.balance);
   return (partyBalanceSort==='asc'?difference:-difference)||a.index-b.index;
@@ -70,6 +125,7 @@ function showAllParties(){
 }
 async function showPartyLedger(index){
  const party=(data.parties||[])[index];if(!party)return;
+ const monthFilter=document.getElementById('modalMonthFilter');monthFilter.hidden=true;monthFilter.onchange=null;
  const id=String(party.partyId||party.id||party.name);
  fill('modalTitle',party.name+' — Party Ledger');
  const body=document.getElementById('modalBody');
@@ -86,24 +142,56 @@ function reportRows(m){return (m.reports||[]).map(r=>{const mat=num(r.materialCo
 function render(){const m=monthView(),c=calc(m),parties=partyView();fill('monthlyTotal',amount(c.total));fill('materialTotal',amount(c.mat));fill('workforceTotal',amount(c.workforce));fill('serviceTotal',amount(c.service));fill('serviceChargeLabel',`Service Charge (${num(data?.project?.pmcPercent)}% PMC + ${num(data?.project?.gstPercent)}% GST)`);fill('cashIn',amount(c.cashIn));fill('cashOut',amount(c.cashOut));fill('summaryBasis',currentMonth==='all'?'Total Project — material and workforce bills only. Service charge is shown separately.':'Selected month — material and workforce bills only. Service charge is shown separately.');table('materialsBody',(m.materials||[]).slice(0,6).map(x=>makeRow([x.name,`${x.quantity} ${x.unit||''}`.trim(),amount(x.total)])),3);table('partiesBody',parties.length?[partyRows(parties.slice(0,6))]:[],3);const totalBalance=parties.reduce((total,party)=>total+num(party.balance),0);fill('partyTotalBalance',amount(totalBalance));const totalEl=document.getElementById('partyTotalBalance');if(totalEl){totalEl.classList.toggle('advance',totalBalance<-.005);totalEl.classList.toggle('settled',Math.abs(totalBalance)<.005);}table('reportsBody',reportRows(m).slice(0,6),4);table('remarksBody',(m.remarks||[]).slice(0,6).map(remarkRow),2);}
 function selectMonth(v){currentMonth=v;document.getElementById('monthSelect').value=v;render();}
 function buildMonths(){const select=document.getElementById('monthSelect');const months=Object.keys(data.months||{}).sort().reverse();select.innerHTML='<option value="all">Total Project</option>'+months.map(m=>'<option value="'+safe(m)+'">'+new Date(m+'-01T12:00:00').toLocaleString('en-IN',{month:'short',year:'numeric'})+'</option>').join('');const asked=params.get('month');selectMonth(months.includes(asked)?asked:'all');}
-function modal(title,headers,records,renderRow=makeRow){fill('modalTitle',title);document.getElementById('modalBody').innerHTML='<table><thead><tr>'+headers.map(x=>'<th>'+safe(x)+'</th>').join('')+'</tr></thead><tbody>'+((records.length)?records.map(renderRow).join(''):'<tr><td class="empty" colspan="'+headers.length+'">No records</td></tr>')+'</tbody></table>';document.getElementById('modal').classList.add('show');}
+function renderModalTable(headers,records,renderRow=makeRow){document.getElementById('modalBody').innerHTML='<table><thead><tr>'+headers.map(x=>'<th>'+safe(x)+'</th>').join('')+'</tr></thead><tbody>'+((records.length)?records.map(renderRow).join(''):'<tr><td class="empty" colspan="'+headers.length+'">No records</td></tr>')+'</tbody></table>';}
+function modal(title,headers,records,renderRow=makeRow){const filter=document.getElementById('modalMonthFilter'),dialog=document.getElementById('modal');filter.hidden=true;filter.onchange=null;dialog.classList.remove('task-schedule-modal');fill('modalTitle',title);renderModalTable(headers,records,renderRow);dialog.classList.add('show');}
+function showTaskSchedule(){
+ const filter=document.getElementById('modalMonthFilter');
+ filter.innerHTML='<option value="Ongoing">Ongoing</option><option value="Completed">Completed</option><option value="Upcoming">Upcoming</option>';
+ filter.value='Ongoing';filter.hidden=false;fill('modalTitle','Project Task Schedule');
+ function renderTasks(){const selected=filter.value,tasks=projectTasks.filter(task=>taskStatus(task)===selected);const headers=['Task','Start date','End date','Status','Progress','Subtasks','Comments'];renderModalTable(headers,tasks,task=>'<tr'+(taskDelayed(task)?' class="task-delayed-row"':'')+'><td>'+safe(task.title)+(taskDelayed(task)?'<br><b class="task-delay-label">Delayed</b>':'')+'</td><td>'+safe(task.startDate)+'</td><td>'+safe(task.endDate)+'</td><td>'+taskStatus(task)+'</td><td>'+Math.max(0,Math.min(100,Number(task.progress)||0))+'%</td><td>'+safe((task.subtasks||[]).map(item=>(item.completed?'✓ ':'□ ')+item.title).join('\n')||'—')+'</td><td class="task-popup-comments">'+safe(task.comments||'—')+'</td></tr>');}
+ const dialog=document.getElementById('modal');filter.onchange=renderTasks;renderTasks();dialog.classList.add('task-schedule-modal','show');
+}
+function dateSortKey(value){const s=String(value||'');const m=s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/);if(m)return Number(m[3]+m[2].padStart(2,'0')+m[1].padStart(2,'0'));const d=new Date(s);return Number.isNaN(d.valueOf())?0:Number(d.toISOString().slice(0,10).replaceAll('-',''));}
+function showMonthlyDetail(type){
+ const isReports=type==='reports',title=isReports?'Recent Daily Expenses':'Remarks';
+ const headers=isReports?['Date','Workforce Count','Workforce Cost','Material Cost','Total']:['Date','Remark'];
+ const filter=document.getElementById('modalMonthFilter'),monthKeys=Object.keys(data.months||{}).sort().reverse();
+ filter.innerHTML='<option value="all">All months</option>'+monthKeys.map(key=>'<option value="'+safe(key)+'">'+safe(new Date(key+'-01T12:00:00').toLocaleString('en-IN',{month:'long',year:'numeric'}))+'</option>').join('');
+ filter.value=currentMonth==='all'||!monthKeys.includes(currentMonth)?'all':currentMonth;
+ function renderSelectedMonth(){
+  const key=filter.value,records=key==='all'?Object.values(data.months||{}).flatMap(month=>month[type]||[]):(data.months[key]?.[type]||[]).slice();
+  records.sort((a,b)=>dateSortKey(b.date)-dateSortKey(a.date));
+  if(isReports)renderModalTable(headers,records,r=>makeRow([r.date,num(r.workforce),amount(Math.max(0,num(r.expenditure)-num(r.materialCost))),amount(r.materialCost),amount(r.expenditure)]));
+  else renderModalTable(headers,records,remarkRow);
+ }
+ fill('modalTitle',title);filter.hidden=false;filter.onchange=renderSelectedMonth;renderSelectedMonth();document.getElementById('modal').classList.add('show');
+}
 function showDetail(type){
  if(type==='parties'){showAllParties();return;}
+ if(type==='reports'||type==='remarks'){showMonthlyDetail(type);return;}
  const m=monthView();
- const options={materials:['Material List',['Material','Quantity / Unit','Amount'],(m.materials||[]).map(x=>[x.name,`${x.quantity} ${x.unit||''}`,amount(x.total)])],reports:['Recent Daily Expenses',['Date','Workforce Cost','Materials Cost','Total'],(m.reports||[]).map(x=>[x.date,amount(Math.max(0,num(x.expenditure)-num(x.materialCost))),amount(x.materialCost),amount(x.expenditure)])],remarks:['Remarks',['Date','Remark'],(m.remarks||[])]};
- if(options[type]){if(type==='remarks'){modal(...options[type],remarkRow);}else{modal(...options[type]);}}
+ const options={materials:['Material List',['Material','Quantity / Unit','Amount'],(m.materials||[]).map(x=>[x.name,`${x.quantity} ${x.unit||''}`,amount(x.total)])]};
+ if(options[type])modal(...options[type]);
 }
 document.querySelectorAll('[data-view]').forEach(el=>el.addEventListener('click',e=>{e.preventDefault();showDetail(el.dataset.view);}));
+document.getElementById('openTaskSchedule').addEventListener('click',showTaskSchedule);
+document.getElementById('taskCarouselPrev').addEventListener('click',()=>{const list=document.getElementById('clientTaskSchedules'),card=list.querySelector('.client-task-card'),step=card?card.getBoundingClientRect().width+7:list.clientWidth;list.scrollBy({left:-step,behavior:'smooth'});});
+document.getElementById('taskCarouselNext').addEventListener('click',()=>{const list=document.getElementById('clientTaskSchedules'),card=list.querySelector('.client-task-card'),step=card?card.getBoundingClientRect().width+7:list.clientWidth;list.scrollBy({left:step,behavior:'smooth'});});
+document.getElementById('clientTaskSchedules').addEventListener('scroll',syncTaskCarouselButtons,{passive:true});
+window.addEventListener('resize',syncTaskCarouselButtons);
+if('ResizeObserver' in window)new ResizeObserver(syncTaskCarouselButtons).observe(document.getElementById('clientTaskSchedules'));
+function syncTaskScheduleHeight(){const summary=document.getElementById('monthly'),tasks=document.getElementById('taskSchedules');if(summary&&tasks)tasks.style.height=Math.round(summary.getBoundingClientRect().height)+'px';}
+syncTaskScheduleHeight();if('ResizeObserver' in window){new ResizeObserver(syncTaskScheduleHeight).observe(document.getElementById('monthly'));}window.addEventListener('resize',syncTaskScheduleHeight);
 document.getElementById('modalBody').addEventListener('click',e=>{const btn=e.target.closest('[data-modal-party]');if(btn){showPartyLedger(Number(btn.dataset.modalParty));return;}if(e.target.closest('#backPartyList')){showAllParties();return;}if(e.target.closest('#sortPartyBalance')){partyBalanceSort=partyBalanceSort==='asc'?'desc':'asc';showAllParties();return;}});
 document.getElementById('closeModal').onclick=()=>document.getElementById('modal').classList.remove('show');document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')e.currentTarget.classList.remove('show');});document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('modal').classList.remove('show');});document.getElementById('monthSelect').onchange=e=>selectMonth(e.target.value);
-(async()=>{try{data=await fetchData();projectId=data.project.id||projectId;showProject();buildMonths();if(!CONFIG.USE_DEMO)fill('disclaimer','Figures loaded from your configured dashboard service.');}catch(e){setWarning('Could not load live project data: '+e.message);fill('disclaimer','No live data loaded.');fill('projectName','Project unavailable');}})();
+(async()=>{try{data=await fetchData();projectId=data.project.id||projectId;await showProject();buildMonths();await loadTaskSchedules();if(!CONFIG.USE_DEMO)fill('disclaimer','Figures loaded from your configured dashboard service.');}catch(e){setWarning('Could not load live project data: '+e.message);fill('disclaimer','No live data loaded.');fill('projectName','Project unavailable');}})();
 
-// Project session actions live in the dashboard Settings dropdown.
+// Project settings stay in the dropdown; logout is available in the header.
 (function initProjectSettingsMenu(){
   const control=document.getElementById('projectSettingsControl');
   const toggle=document.getElementById('projectSettingsToggle');
   const menu=document.getElementById('projectSettingsMenu');
-  const logout=document.getElementById('clientLogout');
+  const logout=document.getElementById('clientHeaderLogout');
   if(!control||!toggle||!menu)return;
   const close=()=>{menu.hidden=true;toggle.setAttribute('aria-expanded','false');};
   toggle.addEventListener('click',()=>{
@@ -116,8 +204,7 @@ document.getElementById('closeModal').onclick=()=>document.getElementById('modal
     sessionStorage.removeItem('ideaClientAccessToken');
     sessionStorage.removeItem('ideaClientProjectId');
     sessionStorage.removeItem('ideaPreviewAccess');
-    close();
-    location.replace('client-access.html');
+    location.replace('login.html');
   });
 })();
 
@@ -168,7 +255,7 @@ document.getElementById('closeModal').onclick=()=>document.getElementById('modal
       sessionStorage.removeItem('ideaPreviewAccess');
       form.reset();
       status.textContent='Access code changed. Redirecting to sign in…';
-      location.replace('client-access.html');
+      location.replace('login.html');
     }catch(err){status.textContent=err.message||'Unable to change access code';save.disabled=false;}
   });
 })();

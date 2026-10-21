@@ -1,0 +1,66 @@
+.reports-login-layout{align-self:start}
+.login-destination-options{display:grid;gap:12px;margin-top:24px}
+.login-destination{display:grid;width:100%;gap:7px;padding:17px 18px;border:1px solid #e2e2e2;border-radius:16px;background:#fff;box-shadow:0 6px 20px rgba(0,0,0,.06);text-align:left;font:inherit;cursor:pointer;transition:border-color .16s,transform .16s}
+.login-destination:hover{border-color:#aaa;transform:translateY(-1px)}
+.login-destination strong{font-size:16px;color:#222}
+.login-destination span{font-size:13px;color:#666;line-height:1.5}
+.login-destination b{font-size:13px;color:#5D4BA3;margin-top:4px}
+.login-form-panel[hidden]{display:none}
+.login-back{border:0;background:transparent;color:#5D4BA3;font:inherit;font-size:13px;font-weight:800;padding:0;margin:0 0 18px;cursor:pointer}
+.report-workspace{width:min(920px,100%);margin:0 auto;align-self:start}
+.report-workspace-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+.report-workspace-head h1{font-size:clamp(28px,5vw,42px);line-height:1.05;letter-spacing:-.045em;margin:15px 0 0}
+.report-user{display:flex;align-items:center;gap:14px;color:#555;font-size:13px;font-weight:800}
+.report-card{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--soft);padding:18px 20px}
+.report-selection{display:grid;grid-template-columns:.85fr 1.15fr;gap:14px}
+.report-selection label,.remarks-field{display:block;min-width:0}
+.report-selection label>span,.remarks-field>span{display:block;font-size:12px;font-weight:850;color:#555;margin-bottom:8px}
+.report-selection input,.report-selection select,.remarks-field textarea,.entry-dialog input,.entry-dialog select,.entry-dialog textarea{font:inherit;font-size:14px;width:100%;border:1px solid #ddd;background:#fff;border-radius:12px;padding:12px 13px;outline:none}
+.report-selection input:focus,.report-selection select:focus,.remarks-field textarea:focus,.entry-dialog input:focus,.entry-dialog select:focus,.entry-dialog textarea:focus{border-color:#888}
+.report-status{font-size:13px;color:#666;padding:2px 3px 0;min-height:20px}
+.report-section{margin-top:14px;padding:0;overflow:hidden}
+.report-section-head{display:flex;align-items:center;gap:12px;min-height:48px;padding:8px 16px;border-bottom:1px solid #eceef0}
+.report-section-head h2{font-size:14px;margin:0;font-weight:950;letter-spacing:.01em}
+.text-action{border:0;background:none;color:#5D4BA3;font:inherit;font-size:13px;font-weight:850;cursor:pointer;padding:7px 8px;border-radius:9px}
+.text-action:hover{background:#f4f2fa}
+.text-action:disabled{opacity:.5;cursor:not-allowed}
+.record-list{padding:0 16px}
+.report-record{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #f0f0f0}
+.report-record:last-child{border-bottom:0}
+.record-main{min-width:0;flex:1}
+.record-title{font-size:13px;font-weight:800;color:#25252b;overflow-wrap:anywhere}
+.record-detail{font-size:11px;color:#777;margin-top:3px;line-height:1.45;overflow-wrap:anywhere}
+.record-amount{font-size:13px;font-weight:850;white-space:nowrap}
+.record-amount.in{color:#2e7d32}.record-amount.out{color:#d32f2f}
+.record-actions{display:flex;gap:4px;flex:0 0 auto}
+.record-actions button{border:0;background:transparent;color:#666;font:inherit;font-size:12px;font-weight:750;cursor:pointer;padding:6px;border-radius:7px}
+.record-actions button:hover{background:#f3f3f4}
+.record-empty{font-size:12px;color:#858585;padding:13px 0}
+.report-total{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f7f7f8;padding:12px 16px;font-size:12px;font-weight:850}
+.report-total strong{font-size:13px;color:#d32f2f}
+.report-cash-totals>span{display:flex;gap:6px;align-items:center}.report-cash-totals>span:first-child strong{color:#2e7d32}.report-cash-totals>span:last-child strong{color:#d32f2f}
+.remarks-field{padding:16px}.remarks-field textarea{resize:vertical;min-height:92px;line-height:1.5}
+.report-error{display:none;background:#fff0ef;color:#9b2820;border:1px solid #ffc4be;border-radius:12px;padding:12px 14px;font-size:13px;margin-top:14px}
+.report-error.visible{display:block}
+.report-save-bar{position:sticky;bottom:12px;z-index:4;margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:14px;background:rgba(255,255,255,.96);border:1px solid #e8e8e8;border-radius:18px;padding:10px 12px 10px 16px;box-shadow:0 12px 30px rgba(0,0,0,.12);backdrop-filter:blur(12px)}
+.report-save-bar>span{font-size:12px;color:#666;font-weight:750}
+.report-save-bar .submit{width:auto;min-width:155px;margin:0;padding:12px 20px}
+.report-save-bar .submit:disabled{opacity:.55;cursor:not-allowed}
+.entry-dialog{width:min(560px,calc(100% - 24px));max-height:min(88dvh,760px);padding:0;border:0;border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,.25)}
+.entry-dialog::backdrop{background:rgba(15,15,18,.52);backdrop-filter:blur(2px)}
+.entry-dialog form{padding:20px;max-height:inherit;overflow:auto}
+.dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.dialog-head h2{font-size:18px;margin:0}
+.dialog-close{width:34px;height:34px;border:0;border-radius:50%;background:#f2f2f3;font-size:23px;cursor:pointer;color:#555}
+.dialog-fields{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.entry-field{display:block;min-width:0}
+.entry-field.full{grid-column:1/-1}
+.entry-field>span{display:block;font-size:12px;font-weight:800;color:#555;margin-bottom:7px}
+.entry-field textarea{resize:vertical;min-height:72px}
+.dialog-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+.dialog-actions .btn{cursor:pointer;padding:11px 18px}
+@media(max-width:700px){.report-workspace-head{align-items:flex-start;flex-direction:column}.report-user{width:100%;justify-content:space-between}.report-selection{grid-template-columns:1fr}.report-card{padding-left:15px;padding-right:15px}.report-section{padding:0}.report-cash-totals{align-items:flex-start;flex-direction:column}.report-save-bar{bottom:8px}.report-save-bar .submit{min-width:120px;padding:12px}.dialog-fields{grid-template-columns:1fr}.entry-field.full{grid-column:auto}}
+.authenticated-view header .site-nav,
+.authenticated-view header .call-link,
+.authenticated-view header .mobile-toggle,
+.authenticated-view header .mini-links{display:none!important}
