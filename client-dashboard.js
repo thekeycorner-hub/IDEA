@@ -97,7 +97,7 @@ function ledgerHtml(result){if(!result.success)return '<p class="ledger-error">'
  const entries=result.entries||[];if(!entries.length)return '<p class="ledger-empty">No transactions for this party.</p>';
  return '<div class="ledger-scroller"><table class="ledger-table"><thead><tr><th>Date</th><th>Debit / Credit</th><th>Material / Payment</th><th>Description</th><th>Balance</th></tr></thead><tbody>'+entries.map(e=>{
  const delta=num(e.delta),positive=delta>=0;
- return '<tr><td>'+safe(e.date||e.isoDate)+'</td><td class="'+(positive?'ledger-credit':'ledger-debit')+'">'+(positive?'Cr ':'Dr ')+safe(amount(Math.abs(delta)))+'</td><td>'+safe(e.item||ledgerType(e.source,delta))+'</td><td>'+safe(e.description||'—')+'</td><td class="right">'+safe(amount(e.runningBalance))+'</td></tr>';
+ return '<tr><td>'+safe(e.date||e.isoDate)+'</td><td class="'+(positive?'ledger-credit':'ledger-debit')+'">'+(positive?'Cr ':'Dr ')+safe(amount(Math.abs(delta)))+'</td><td>'+safe(e.item||ledgerType(e.source,delta))+'</td><td>'+safe(String(e.description||'').replace(/^\s*[\d.]+%\s*PMC\s*\+\s*[\d.]+%\s*GST\s+on\s*/i,'')||'—')+'</td><td class="right">'+safe(amount(e.runningBalance))+'</td></tr>';
  }).join('')+'</tbody></table></div><p class="ledger-foot">Closing balance: <strong>'+safe(amount(result.balance))+'</strong> · Credit increases outstanding; debit reduces it. Negative means advance paid.</p>';
 }
 async function fetchPartyLedger(party){
